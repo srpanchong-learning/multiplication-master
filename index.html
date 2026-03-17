@@ -1,1455 +1,1163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multiplication Master</title>
-  <style>
-    :root{
-      --bg:#f4f8ff;
-      --card:#ffffff;
-      --blue:#2563eb;
-      --blue-dark:#1d4ed8;
-      --yellow:#fbbf24;
-      --green:#10b981;
-      --red:#ef4444;
-      --purple:#8b5cf6;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --line:#dbe4f0;
-      --shadow:0 12px 30px rgba(37,99,235,.10);
-      --radius:22px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at top left, #dbeafe 0%, transparent 28%),
-        radial-gradient(circle at top right, #fde68a 0%, transparent 22%),
-        linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
-      color:var(--text);
-      min-height:100vh;
-    }
-    .app{max-width:1220px;margin:0 auto;padding:20px}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{
-      width:56px;height:56px;border-radius:18px;
-      background:linear-gradient(135deg,var(--blue),var(--purple));
-      display:grid;place-items:center;color:#fff;font-size:28px;font-weight:700;box-shadow:var(--shadow)
-    }
-    .brand h1{margin:0;font-size:28px}
-    .brand p{margin:4px 0 0;color:var(--muted);font-size:14px}
-    .top-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{
-      border:none;border-radius:16px;padding:12px 16px;font-weight:700;cursor:pointer;transition:.2s;font-size:14px
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{background:var(--blue);color:#fff}
-    .btn-primary:hover{background:var(--blue-dark)}
-    .btn-secondary{background:#fff;color:var(--blue);border:2px solid #bfd4ff}
-    .btn-green{background:var(--green);color:#fff}
-    .btn-yellow{background:var(--yellow);color:#7c4a00}
-    .btn-red{background:var(--red);color:#fff}
-    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
-
-    .grid{display:grid;gap:18px}
-    .grid-hero{grid-template-columns:1.05fr .95fr;align-items:start}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
-    .hero-box{background:linear-gradient(135deg,#eff6ff,#ffffff);border:1px solid #dbeafe;border-radius:24px;padding:22px}
-    .hero-box h2{margin:0 0 10px;font-size:32px;line-height:1.1}
-    .hero-box p{margin:0 0 16px;color:var(--muted);line-height:1.5}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
-    .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}
-    .stat .n{font-size:26px;font-weight:800;color:var(--blue)}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:700}
-    input, select{
-      width:100%;padding:12px 14px;border-radius:14px;border:2px solid #dbe7fb;outline:none;
-      font-size:15px;background:#fff;margin-bottom:12px
-    }
-    input:focus, select:focus{border-color:#93c5fd}
-    .section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-    .section-title h3{margin:0;font-size:24px}
-    .section-title p{margin:5px 0 0;color:var(--muted);font-size:14px}
-
-    .tables{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:14px}
-    .table-card{
-      border-radius:20px;padding:16px;border:2px solid #dbeafe;background:linear-gradient(180deg,#ffffff,#f8fbff);
-      position:relative;overflow:hidden
-    }
-    .table-card.locked{opacity:.65;border-color:#e5e7eb;background:linear-gradient(180deg,#fafafa,#f3f4f6)}
-    .table-number{font-size:34px;font-weight:900;color:var(--blue);margin:6px 0}
-    .locked .table-number{color:#9ca3af}
-    .tag{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;font-weight:800;background:#dbeafe;color:var(--blue)}
-    .tag.locked{background:#e5e7eb;color:#6b7280}
-    .progress{width:100%;height:11px;background:#e5edfb;border-radius:999px;overflow:hidden;margin:10px 0 6px}
-    .progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:999px}
-
-    .methods{display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:14px}
-    .method-card{border:2px solid #dbeafe;background:#fff;border-radius:20px;padding:16px;cursor:pointer;transition:.2s}
-    .method-card:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.06)}
-    .method-card.done{border-color:#bbf7d0;background:#f0fdf4}
-    .method-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .method-order{
-      width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#eff6ff;color:var(--blue);font-weight:900
-    }
-    .method-card.done .method-order{background:#10b981;color:#fff}
-    .muted{color:var(--muted);font-size:14px;line-height:1.45}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-weight:800;font-size:12px}
-
-    .quiz-wrap{display:grid;grid-template-columns:1fr .9fr;gap:18px}
-    .question-box{
-      min-height:240px;display:flex;flex-direction:column;justify-content:center;gap:18px;
-      background:linear-gradient(135deg,#ffffff,#eff6ff)
-    }
-    .question{font-size:38px;font-weight:900;line-height:1.25;text-align:center}
-    .question-small{color:var(--muted);text-align:center;font-size:15px}
-    .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px}
-    .answer-btn{
-      width:100%;text-align:center;padding:15px;border-radius:16px;border:2px solid #dbeafe;background:#fff;
-      font-size:18px;font-weight:800;cursor:pointer
-    }
-    .answer-btn:hover{border-color:#93c5fd}
-    .quiz-side .mini{background:#f8fbff;border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:12px}
-    .big-center{text-align:center;padding:24px;border:2px dashed #c7d8fb;border-radius:20px;background:#f8fbff}
-
-    .leaderboard-list,.teacher-table{width:100%;border-collapse:collapse}
-    .leaderboard-list td,.teacher-table td,.teacher-table th{
-      padding:12px 10px;border-bottom:1px solid #e5edf8;text-align:left;font-size:14px
-    }
-    .teacher-table th{color:#4b5563;background:#f8fbff;font-size:13px}
-    .rank{width:40px;font-weight:900;color:var(--blue)}
-
-    .hidden{display:none !important}
-    .success{color:#047857;font-weight:800}
-    .danger{color:#b91c1c;font-weight:800}
-    .small{font-size:12px;color:var(--muted)}
-    .status{font-size:13px;color:var(--muted);margin-top:8px}
-    .footer-note{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
-
-    .coins-box{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .shop-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px}
-    .shop-item{border:2px solid #dbeafe;border-radius:20px;padding:16px;background:#fff}
-    .shop-item.owned{border-color:#bbf7d0;background:#f0fdf4}
-    .item-preview{
-      height:84px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;
-      font-size:28px;font-weight:900;border:2px dashed #dbeafe;background:#f8fbff
-    }
-    .item-preview.bg-sky{background:linear-gradient(180deg,#dbeafe,#eff6ff)}
-    .item-preview.bg-jungle{background:linear-gradient(180deg,#dcfce7,#bbf7d0)}
-    .item-preview.bg-galaxy{background:linear-gradient(180deg,#1e1b4b,#4c1d95); color:#fff}
-    .item-preview.frame-bronze{box-shadow:inset 0 0 0 6px #cd7f32}
-    .item-preview.frame-rainbow{box-shadow:inset 0 0 0 6px #8b5cf6}
-    .item-preview.frame-champion{box-shadow:inset 0 0 0 6px #f59e0b}
-    .item-preview.avatar-blue{background:#dbeafe}
-    .item-preview.avatar-robot{background:#e5e7eb}
-    .item-preview.avatar-ninja{background:#ede9fe}
-    .owned-badge{
-      display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;margin-left:6px
-    }
-
-    .profile-strip{
-      display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:#f8fbff;
-      border:1px solid var(--line);margin-top:12px
-    }
-    .profile-avatar{
-      width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;
-      background:#fff;border:3px solid #dbeafe;flex-shrink:0
-    }
-    .profile-avatar.frame-bronze{box-shadow:0 0 0 5px #cd7f32 inset}
-    .profile-avatar.frame-rainbow{box-shadow:0 0 0 5px #8b5cf6 inset}
-    .profile-avatar.frame-champion{box-shadow:0 0 0 5px #f59e0b inset}
-    .profile-avatar.avatar-blue{background:#dbeafe}
-    .profile-avatar.avatar-ninja{background:#ede9fe}
-    .profile-avatar.avatar-robot{background:#e5e7eb}
-
-    .bg-sky-theme{background:linear-gradient(180deg,#dbeafe,#eff6ff)}
-    .bg-jungle-theme{background:linear-gradient(180deg,#dcfce7,#f0fdf4)}
-    .bg-galaxy-theme{background:linear-gradient(180deg,#1e1b4b,#312e81); color:#fff}
-    .bg-galaxy-theme .muted,
-    .bg-galaxy-theme .small,
-    .bg-galaxy-theme label,
-    .bg-galaxy-theme .section-title p{color:#dbeafe}
-
-    /* Visual quiz widgets */
-    .visual-board{
-      background:#fff;border:2px solid #e6eefb;border-radius:24px;padding:24px;min-height:250px;
-      display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px
-    }
-    .array-wrap{display:grid;gap:14px;justify-content:center;align-items:center}
-    .array-row{display:flex;gap:14px;justify-content:center}
-    .array-dot{
-      width:34px;height:34px;border-radius:50%;background:#6366f1;transform:scale(0.2);opacity:0;animation:popIn .35s ease forwards
-    }
-    @keyframes popIn{to{transform:scale(1);opacity:1}}
-    .array-caption{color:var(--muted);font-weight:700}
-
-    .numberline-wrap{width:100%;max-width:720px;padding:20px 10px 10px}
-    .numberline-svg{width:100%;height:auto;display:block}
-    .jump-path{
-      fill:none;stroke:#fb7185;stroke-width:4;stroke-linecap:round;stroke-dasharray:160;stroke-dashoffset:160;
-      animation:drawJump .7s ease forwards
-    }
-    @keyframes drawJump{to{stroke-dashoffset:0}}
-    .line-base{stroke:#6366f1;stroke-width:5;stroke-linecap:round}
-    .tick{stroke:#6366f1;stroke-width:3}
-    .tick-label{font-size:14px;fill:#334155;font-weight:700}
-
-    .dragdrop-wrap{display:flex;flex-direction:column;align-items:center;gap:20px}
-    .drag-equation{font-size:38px;font-weight:900;text-align:center}
-    .drop-zone{
-      min-width:140px;min-height:72px;border:3px dashed #bfd4ff;border-radius:18px;display:flex;align-items:center;
-      justify-content:center;font-size:24px;font-weight:800;color:#94a3b8;background:#f8fbff
-    }
-    .drop-zone.over{border-color:#6366f1;background:#eef2ff}
-    .drag-options{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
-    .drag-chip{
-      padding:16px 22px;border:3px dashed #6366f1;border-radius:16px;background:#fff;font-size:28px;font-weight:800;
-      color:#1e293b;cursor:grab;user-select:none
-    }
-    .drag-chip:active{cursor:grabbing}
-    .drag-chip.used{opacity:.35;pointer-events:none}
-    .visual-answer-row{
-      display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;width:100%
-    }
-    .visual-answer-row input{max-width:260px;margin:0}
-
-    .streak-box{
-      background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:16px;padding:10px 12px;font-weight:700
-    }
-
-    .celebration-overlay{
-      position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;
-      z-index:9999;padding:20px
-    }
-    .celebration-overlay.show{display:flex}
-    .celebration-card{
-      width:min(560px, 100%);background:#fff;border-radius:28px;padding:28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.25);
-      position:relative;overflow:hidden
-    }
-    .celebration-card h2{margin:0 0 10px;font-size:34px}
-    .celebration-card p{margin:6px 0;color:var(--muted)}
-    .celebration-icons{font-size:34px;margin-bottom:10px}
-    .confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-    .confetti{
-      position:absolute;width:10px;height:18px;opacity:.9;animation:fall 2.2s linear forwards;border-radius:3px
-    }
-    @keyframes fall{
-      from{transform:translateY(-30px) rotate(0deg)}
-      to{transform:translateY(420px) rotate(540deg);opacity:0}
-    }
-
-    @media (max-width: 900px){
-      .grid-hero,.quiz-wrap{grid-template-columns:1fr}
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .answers{grid-template-columns:1fr}
-      .question{font-size:30px}
-      .drag-equation{font-size:28px}
-      .drag-chip{font-size:22px}
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multiplication Master Worlds</title>
+<style>
+:root{
+  --bg:#f4f8ff; --card:#ffffff; --blue:#2563eb; --blue-dark:#1d4ed8; --yellow:#fbbf24;
+  --green:#10b981; --red:#ef4444; --purple:#8b5cf6; --text:#1f2937; --muted:#6b7280;
+  --line:#dbe4f0; --shadow:0 12px 30px rgba(37,99,235,.10); --radius:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);
+  background:
+    radial-gradient(circle at top left, #dbeafe 0%, transparent 28%),
+    radial-gradient(circle at top right, #fde68a 0%, transparent 22%),
+    linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
+}
+.app{max-width:1260px;margin:0 auto;padding:18px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,var(--blue),var(--purple));display:grid;place-items:center;color:#fff;font-size:28px;font-weight:700;box-shadow:var(--shadow)}
+.brand h1{margin:0;font-size:28px}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.nav{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:none;border-radius:16px;padding:12px 16px;font-weight:700;cursor:pointer;font-size:14px}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-secondary{background:#fff;color:var(--blue);border:2px solid #bfd4ff}
+.btn-green{background:var(--green);color:#fff}
+.btn-gold{background:var(--yellow);color:#7c4a00}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.grid{display:grid;gap:18px}
+.grid-hero{grid-template-columns:1.05fr .95fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.hero{background:linear-gradient(135deg,#eff6ff,#fff);border:1px solid #dbeafe;border-radius:24px;padding:22px}
+.hero h2{margin:0 0 8px;font-size:32px}
+.hero p{margin:0;color:var(--muted);line-height:1.5}
+.profile{display:flex;gap:12px;align-items:center;background:#f8fbff;border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:14px}
+.avatar{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#fff;border:3px solid #dbeafe;flex-shrink:0}
+.avatar.frame-bronze{box-shadow:0 0 0 5px #cd7f32 inset}
+.avatar.frame-rainbow{box-shadow:0 0 0 5px #8b5cf6 inset}
+.avatar.frame-champion{box-shadow:0 0 0 5px #f59e0b inset}
+.avatar.avatar-blue{background:#dbeafe}
+.avatar.avatar-robot{background:#e5e7eb}
+.avatar.avatar-ninja{background:#ede9fe}
+.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center}
+.stat .n{font-size:24px;font-weight:800;color:var(--blue)}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:700}
+input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #dbe7fb;outline:none;font-size:15px;background:#fff;margin-bottom:12px}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.section-title h3{margin:0;font-size:24px}
+.section-title p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.small{font-size:12px;color:var(--muted)}
+.hidden{display:none !important}
+.success{color:#047857;font-weight:800}
+.danger{color:#b91c1c;font-weight:800}
+.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-weight:800;font-size:12px}
+.world-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.world-card{border-radius:20px;padding:16px;border:2px solid #dbeafe;background:linear-gradient(180deg,#fff,#f8fbff);cursor:pointer;position:relative}
+.world-card.locked{opacity:.55;border-color:#e5e7eb;background:linear-gradient(180deg,#fafafa,#f3f4f6)}
+.world-card.done{border-color:#bbf7d0;background:#f0fdf4}
+.world-icon{font-size:34px}
+.world-table{font-size:28px;font-weight:900;color:var(--blue);margin-top:8px}
+.progress{width:100%;height:10px;background:#e5edfb;border-radius:999px;overflow:hidden;margin:10px 0 6px}
+.progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:999px}
+.methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.method-card{border:2px solid #dbeafe;background:#fff;border-radius:20px;padding:16px;cursor:pointer}
+.method-card.done{border-color:#bbf7d0;background:#f0fdf4}
+.method-head{display:flex;justify-content:space-between;align-items:center}
+.method-order{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#eff6ff;color:var(--blue);font-weight:900}
+.method-card.done .method-order{background:#10b981;color:#fff}
+.quiz-wrap{display:grid;grid-template-columns:1fr .9fr;gap:18px}
+.question-box{min-height:260px;display:flex;flex-direction:column;justify-content:center;gap:18px;background:linear-gradient(135deg,#fff,#eff6ff)}
+.question{font-size:34px;font-weight:900;line-height:1.25;text-align:center}
+.question-small{color:var(--muted);text-align:center;font-size:15px}
+.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.answer-btn{width:100%;padding:15px;border-radius:16px;border:2px solid #dbeafe;background:#fff;font-size:18px;font-weight:800;cursor:pointer}
+.answer-btn:hover{border-color:#93c5fd}
+.mini{background:#f8fbff;border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:12px}
+.visual-board{background:#fff;border:2px solid #e6eefb;border-radius:24px;padding:24px;min-height:250px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+.array-wrap{display:grid;gap:14px;justify-content:center}
+.array-row{display:flex;gap:12px;justify-content:center}
+.array-dot{width:30px;height:30px;border-radius:50%;background:#6366f1;transform:scale(.2);opacity:0;animation:popIn .35s ease forwards}
+@keyframes popIn{to{transform:scale(1);opacity:1}}
+.numberline-wrap{width:100%;max-width:720px;padding:20px 10px 10px}
+.numberline-svg{width:100%;height:auto;display:block}
+.jump-path{fill:none;stroke:#fb7185;stroke-width:4;stroke-linecap:round;stroke-dasharray:160;stroke-dashoffset:160;animation:drawJump .7s ease forwards}
+@keyframes drawJump{to{stroke-dashoffset:0}}
+.line-base{stroke:#6366f1;stroke-width:5;stroke-linecap:round}
+.tick{stroke:#6366f1;stroke-width:3}
+.tick-label{font-size:14px;fill:#334155;font-weight:700}
+.dragdrop-wrap{display:flex;flex-direction:column;align-items:center;gap:20px}
+.drag-equation{font-size:34px;font-weight:900;text-align:center}
+.drop-zone{min-width:140px;min-height:72px;border:3px dashed #bfd4ff;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#94a3b8;background:#f8fbff}
+.drop-zone.over{border-color:#6366f1;background:#eef2ff}
+.drag-options{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+.drag-chip{padding:14px 18px;border:3px dashed #6366f1;border-radius:16px;background:#fff;font-size:24px;font-weight:800;cursor:grab}
+.drag-chip.used{opacity:.35;pointer-events:none}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.shop-item{border:2px solid #dbeafe;border-radius:20px;padding:16px;background:#fff}
+.shop-item.owned{border-color:#bbf7d0;background:#f0fdf4}
+.item-preview{height:84px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:28px;font-weight:900;border:2px dashed #dbeafe;background:#f8fbff}
+.item-preview.bg-sky{background:linear-gradient(180deg,#dbeafe,#eff6ff)}
+.item-preview.bg-jungle{background:linear-gradient(180deg,#dcfce7,#bbf7d0)}
+.item-preview.bg-galaxy{background:linear-gradient(180deg,#1e1b4b,#4c1d95);color:#fff}
+.item-preview.frame-bronze{box-shadow:inset 0 0 0 6px #cd7f32}
+.item-preview.frame-rainbow{box-shadow:inset 0 0 0 6px #8b5cf6}
+.item-preview.frame-champion{box-shadow:inset 0 0 0 6px #f59e0b}
+.item-preview.avatar-blue{background:#dbeafe}
+.item-preview.avatar-robot{background:#e5e7eb}
+.item-preview.avatar-ninja{background:#ede9fe}
+.owned-badge{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;margin-left:6px}
+.lb-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 10px;border-bottom:1px solid #e5edf8}
+.lb-left{display:flex;align-items:center;gap:12px}
+.lb-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid #dbeafe;font-size:20px}
+.lb-avatar.frame-bronze{box-shadow:0 0 0 3px #cd7f32 inset}
+.lb-avatar.frame-rainbow{box-shadow:0 0 0 3px #8b5cf6 inset}
+.lb-avatar.frame-champion{box-shadow:0 0 0 3px #f59e0b inset}
+.lb-rank{font-weight:900;color:var(--blue);width:28px}
+.sticker{display:inline-block;padding:5px 8px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:12px;font-weight:800}
+.highlight-name{font-weight:900}
+.around-me{background:#f8fbff;border:1px solid var(--line);border-radius:18px;padding:12px}
+.heatmap-grid{display:grid;grid-template-columns:160px repeat(11, 1fr);gap:6px;font-size:12px;align-items:center}
+.heatcell{padding:8px 6px;border-radius:10px;text-align:center;font-weight:800}
+.green{background:#dcfce7;color:#166534}
+.yellow{background:#fef3c7;color:#92400e}
+.red{background:#fee2e2;color:#991b1b}
+.neutral{background:#e5e7eb;color:#374151}
+.boss-box{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff7ed;border:1px solid #fdba74;border-radius:18px;padding:14px}
+.boss-bar{flex:1;height:16px;background:#fed7aa;border-radius:999px;overflow:hidden}
+.boss-bar span{display:block;height:100%;background:linear-gradient(90deg,#f97316,#ef4444)}
+.chest-box{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f5f3ff;border:1px solid #c4b5fd;border-radius:18px;padding:14px}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.overlay.show{display:flex}
+.modal{width:min(560px,100%);background:#fff;border-radius:28px;padding:28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.25);position:relative;overflow:hidden}
+.modal h2{margin:0 0 10px;font-size:34px}
+.modal p{margin:6px 0;color:var(--muted)}
+.confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti{position:absolute;width:10px;height:18px;opacity:.9;animation:fall 2.2s linear forwards;border-radius:3px}
+@keyframes fall{from{transform:translateY(-30px) rotate(0deg)}to{transform:translateY(420px) rotate(540deg);opacity:0}}
+.bg-sky-theme{background:linear-gradient(180deg,#dbeafe,#eff6ff)}
+.bg-jungle-theme{background:linear-gradient(180deg,#dcfce7,#f0fdf4)}
+.bg-galaxy-theme{background:linear-gradient(180deg,#1e1b4b,#312e81);color:#fff}
+.bg-galaxy-theme .muted,.bg-galaxy-theme .small,.bg-galaxy-theme .section-title p,.bg-galaxy-theme label{color:#dbeafe}
+@media (max-width: 900px){
+  .grid-hero,.quiz-wrap{grid-template-columns:1fr}
+  .meta-grid{grid-template-columns:repeat(2,1fr)}
+  .answers{grid-template-columns:1fr}
+  .question{font-size:28px}
+  .drag-equation{font-size:28px}
+  .heatmap-grid{grid-template-columns:120px repeat(11, 1fr);font-size:10px}
+}
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">×</div>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">×</div>
+      <div>
+        <h1>Multiplication Master Worlds</h1>
+        <p>Learning map • daily challenge • bosses • treasure chests • teacher analytics</p>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="showSection('worldsSection')">Worlds</button>
+      <button class="btn btn-secondary" onclick="showSection('shopSection')">Coin Shop</button>
+      <button class="btn btn-secondary" onclick="showSection('leaderboardSection')">Leaderboard</button>
+      <button class="btn btn-secondary" onclick="showSection('teacherSection')">Teacher Dashboard</button>
+    </div>
+  </div>
+
+  <div id="heroCard" class="grid grid-hero">
+    <div class="hero">
+      <h2>Explore the multiplication worlds</h2>
+      <p>Start at Forest ×2, master all 10 methods, defeat the boss, open treasure chests, and unlock the next world.</p>
+
+      <div id="profileBox" class="profile hidden">
+        <div id="profileAvatar" class="avatar">🙂</div>
         <div>
-          <h1>Multiplication Master</h1>
-          <p>Tables 2 to 12 • unlock by mastery • Firebase leaderboard • teacher dashboard</p>
+          <div id="profileName" style="font-size:20px;font-weight:900;">Student</div>
+          <div id="profileTitle" class="muted">No title equipped</div>
+          <div id="profileSticker" class="small">No sticker equipped</div>
+          <div id="profileMeta" class="small">⭐ 0 • 🪙 0</div>
         </div>
       </div>
-      <div class="top-actions">
-        <button class="btn btn-secondary" onclick="showSection('tablesSection')">Tables</button>
-        <button class="btn btn-secondary" onclick="showSection('shopSection')">Coin Shop</button>
-        <button class="btn btn-secondary" onclick="showSection('leaderboardSection')">Leaderboard</button>
-        <button class="btn btn-secondary" onclick="showSection('teacherSection')">Teacher Dashboard</button>
+
+      <div class="meta-grid">
+        <div class="stat"><div class="n">11</div><div>Worlds</div></div>
+        <div class="stat"><div class="n">10</div><div>Methods / World</div></div>
+        <div class="stat"><div class="n">⭐</div><div>Stars</div></div>
+        <div class="stat"><div class="n">🪙</div><div>Coins</div></div>
+      </div>
+
+      <div id="streakBox" class="pill hidden" style="margin-top:14px;"></div>
+      <div id="challengeBox" class="pill hidden" style="margin-top:10px;background:#dbeafe;color:#1d4ed8;"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <div>
+          <h3>Student Login</h3>
+          <p>Use the same name and class to continue progress on any device.</p>
+        </div>
+      </div>
+      <label for="studentName">Student Name</label>
+      <input id="studentName" type="text" placeholder="e.g. Aisyah" />
+      <label for="studentClass">Class</label>
+      <select id="studentClass">
+        <option value="">Select Class</option>
+        <option>Year 1</option><option>Year 2</option><option>Year 3</option>
+        <option>Year 4</option><option>Year 5</option><option>Year 6</option>
+      </select>
+      <button class="btn btn-primary" style="width:100%" onclick="loginStudent()">Start Learning</button>
+      <div id="loginStatus" class="small" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div id="worldsSection" class="card" style="margin-top:18px;">
+    <div class="section-title">
+      <div>
+        <h3>Math Worlds / Learning Map</h3>
+        <p>Unlock the path one world at a time.</p>
+      </div>
+      <div id="currentStudentBox" class="pill">No student yet</div>
+    </div>
+    <div id="worldMap" class="world-map"></div>
+  </div>
+
+  <div id="methodsSection" class="card hidden" style="margin-top:18px;">
+    <div class="section-title">
+      <div>
+        <h3 id="methodsTitle">Training Methods</h3>
+        <p>Concrete → visual → abstract → application.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="showSection('worldsSection')">Back to Worlds</button>
+    </div>
+    <div id="methodsGrid" class="methods"></div>
+
+    <div id="bossSection" class="hidden" style="margin-top:16px;">
+      <div class="boss-box">
+        <div>
+          <div style="font-weight:900">⚔ Boss Battle</div>
+          <div id="bossName" class="small">Boss</div>
+        </div>
+        <div class="boss-bar"><span id="bossBar" style="width:100%"></span></div>
+        <button id="bossBtn" class="btn btn-gold" onclick="startBossBattle()">Start Boss</button>
       </div>
     </div>
 
-    <div id="heroCard" class="grid grid-hero">
-      <div class="hero-box">
-        <h2>Master multiplication step by step</h2>
-        <p>
-          Start at <b>Table 2</b>. Complete all 10 training methods from easiest to hardest.
-          Only then the next table unlocks.
-        </p>
-        <div class="stats">
-          <div class="stat"><div class="n">11</div><div>Tables</div></div>
-          <div class="stat"><div class="n">10</div><div>Methods Each</div></div>
-          <div class="stat"><div class="n">⭐</div><div>Stars</div></div>
-          <div class="stat"><div class="n">🪙</div><div>Coins</div></div>
+    <div id="chestSection" class="hidden" style="margin-top:14px;">
+      <div class="chest-box">
+        <div>
+          <div style="font-weight:900">🎁 Treasure Chest Ready</div>
+          <div class="small">Open your reward chest for this world.</div>
         </div>
-
-        <div id="profileStrip" class="profile-strip hidden">
-          <div id="profileAvatar" class="profile-avatar">🙂</div>
-          <div>
-            <div id="profileName" style="font-size:20px;font-weight:900;">Student</div>
-            <div id="profileTitle" class="muted">No title equipped</div>
-            <div id="profileMeta" class="small">⭐ 0 • 🪙 0</div>
-          </div>
-        </div>
-
-        <div id="streakBox" class="streak-box hidden" style="margin-top:12px;"></div>
+        <button class="btn btn-primary" onclick="openTreasureChest()">Open Chest</button>
       </div>
+    </div>
+  </div>
 
-      <div class="card">
-        <div class="section-title">
-          <div>
-            <h3>Student Login</h3>
-            <p>Use the same name and class to continue progress on any device.</p>
-          </div>
-        </div>
+  <div id="quizSection" class="card hidden" style="margin-top:18px;">
+    <div class="section-title">
+      <div>
+        <h3 id="quizTitle">Quiz</h3>
+        <p>Answer correctly to earn stars and coins.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="backToMethods()">Back to Methods</button>
+    </div>
+    <div class="quiz-wrap">
+      <div class="card question-box">
+        <div id="questionMeta" class="question-small"></div>
+        <div id="questionText" class="question">Ready?</div>
+        <div id="answersArea"></div>
+      </div>
+      <div>
+        <div class="mini"><b>Student:</b> <span id="quizStudent">-</span></div>
+        <div class="mini"><b>World:</b> <span id="quizWorld">-</span></div>
+        <div class="mini"><b>Mode:</b> <span id="quizMode">-</span></div>
+        <div class="mini"><b>Question:</b> <span id="quizProgress">1 / 10</span></div>
+        <div class="mini"><b>Score:</b> <span id="quizScore">0</span></div>
+        <div class="mini"><b>Stars:</b> <span id="quizStars">0</span></div>
+        <div class="mini"><b>Coins:</b> <span id="quizCoins">0</span></div>
+        <div class="mini"><b>Result:</b> <span id="quizFeedback">Answer to begin</span></div>
+      </div>
+    </div>
+  </div>
 
-        <label for="studentName">Student Name</label>
-        <input id="studentName" type="text" placeholder="e.g. Aisyah" />
+  <div id="shopSection" class="card" style="margin-top:18px;">
+    <div class="section-title">
+      <div>
+        <h3>Coin Shop</h3>
+        <p>Buy and equip avatar, title, sticker, frame, and background.</p>
+      </div>
+      <div id="shopCoins" class="pill">🪙 0 coins</div>
+    </div>
+    <div id="inventorySummary" class="small" style="margin-bottom:14px;">Login to view inventory.</div>
+    <div id="shopGrid" class="shop-grid"></div>
+  </div>
 
-        <label for="studentClass">Class</label>
-        <select id="studentClass">
-          <option value="">Select Class</option>
-          <option>Year 1</option>
-          <option>Year 2</option>
-          <option>Year 3</option>
-          <option>Year 4</option>
-          <option>Year 5</option>
-          <option>Year 6</option>
+  <div id="leaderboardSection" class="card" style="margin-top:18px;">
+    <div class="section-title">
+      <div>
+        <h3>Leaderboard</h3>
+        <p>Top champions and your nearby rank.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="loadLeaderboard()">Refresh</button>
+    </div>
+    <div id="topLeaderboard"></div>
+    <div id="aroundMe" class="around-me" style="margin-top:16px;"></div>
+  </div>
+
+  <div id="teacherSection" class="card" style="margin-top:18px;">
+    <div class="section-title">
+      <div>
+        <h3>Teacher Dashboard</h3>
+        <p>Class leaderboard, heatmap, and progress insights.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="loadTeacherDashboard()">Refresh</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
+      <div>
+        <label for="filterClass">Filter by Class</label>
+        <select id="filterClass" onchange="loadTeacherDashboard()">
+          <option value="All">All Classes</option>
+          <option>Year 1</option><option>Year 2</option><option>Year 3</option>
+          <option>Year 4</option><option>Year 5</option><option>Year 6</option>
         </select>
-
-        <button class="btn btn-primary" style="width:100%" onclick="loginStudent()">Start Learning</button>
-        <div id="studentSummary" class="status"></div>
       </div>
+      <div>
+        <label for="teacherSearch">Search Student</label>
+        <input id="teacherSearch" type="text" placeholder="Type name..." oninput="loadTeacherDashboard()" />
+      </div>
+      <button class="btn btn-secondary" onclick="loadTeacherDashboard()">Refresh</button>
     </div>
-
-    <div id="tablesSection" class="card" style="margin-top:18px;">
-      <div class="section-title">
-        <div>
-          <h3>Multiplication Tables</h3>
-          <p>Complete all 10 methods in one table to unlock the next.</p>
-        </div>
-        <div id="currentStudentBox" class="pill">No student yet</div>
-      </div>
-      <div id="tablesGrid" class="tables"></div>
-    </div>
-
-    <div id="methodsSection" class="card hidden" style="margin-top:18px;">
-      <div class="section-title">
-        <div>
-          <h3 id="methodsTitle">Training Methods</h3>
-          <p>Arranged from easiest to hardest.</p>
-        </div>
-        <button class="btn btn-secondary" onclick="showSection('tablesSection')">Back to Tables</button>
-      </div>
-      <div id="methodsGrid" class="methods"></div>
-    </div>
-
-    <div id="quizSection" class="card hidden" style="margin-top:18px;">
-      <div class="section-title">
-        <div>
-          <h3 id="quizTitle">Quiz</h3>
-          <p>10 questions per method. Finish to mark the method complete.</p>
-        </div>
-        <button class="btn btn-secondary" onclick="backToMethods()">Back to Methods</button>
-      </div>
-
-      <div class="quiz-wrap">
-        <div id="questionBox" class="card question-box">
-          <div class="question-small" id="questionMeta"></div>
-          <div class="question" id="questionText">Ready?</div>
-          <div id="answersArea"></div>
-        </div>
-
-        <div class="quiz-side">
-          <div class="mini"><b>Student:</b> <span id="quizStudent">-</span></div>
-          <div class="mini"><b>Table:</b> <span id="quizTable">-</span></div>
-          <div class="mini"><b>Method:</b> <span id="quizMethod">-</span></div>
-          <div class="mini"><b>Question:</b> <span id="quizProgress">1 / 10</span></div>
-          <div class="mini"><b>Score:</b> <span id="quizScore">0</span></div>
-          <div class="mini"><b>Stars this round:</b> <span id="quizStars">0</span></div>
-          <div class="mini"><b>Coins this round:</b> <span id="quizCoins">0</span></div>
-          <div class="mini"><b>Result:</b> <span id="quizFeedback">Answer to begin</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="shopSection" class="card" style="margin-top:18px;">
-      <div class="section-title">
-        <div>
-          <h3>Coin Shop</h3>
-          <p>Spend coins on in-game customisation. Items unlock permanently.</p>
-        </div>
-        <div class="coins-box">
-          <div id="shopCoinsBox" class="pill">🪙 0 coins</div>
-          <button class="btn btn-secondary" onclick="renderShop()">Refresh Shop</button>
-        </div>
-      </div>
-      <div id="inventorySummary" class="small" style="margin-bottom:14px;">Login to view your inventory.</div>
-      <div id="shopGrid" class="shop-grid"></div>
-    </div>
-
-    <div id="leaderboardSection" class="card" style="margin-top:18px;">
-      <div class="section-title">
-        <div>
-          <h3>Leaderboard</h3>
-          <p>Highest stars first, then highest unlocked table.</p>
-        </div>
-        <button class="btn btn-secondary" onclick="loadLeaderboard()">Refresh</button>
-      </div>
-      <table class="leaderboard-list" id="leaderboardTable"></table>
-    </div>
-
-    <div id="teacherSection" class="card" style="margin-top:18px;">
-      <div class="section-title">
-        <div>
-          <h3>Teacher Dashboard</h3>
-          <p>See each pupil's progress, score, coins, and unlocked table.</p>
-        </div>
-        <button class="btn btn-secondary" onclick="loadTeacherDashboard()">Refresh</button>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
-        <div>
-          <label for="filterClass">Filter by Class</label>
-          <select id="filterClass" onchange="loadTeacherDashboard()">
-            <option value="All">All Classes</option>
-            <option>Year 1</option>
-            <option>Year 2</option>
-            <option>Year 3</option>
-            <option>Year 4</option>
-            <option>Year 5</option>
-            <option>Year 6</option>
-          </select>
-        </div>
-        <div>
-          <label for="teacherStudentSearch">Search Student</label>
-          <input id="teacherStudentSearch" type="text" placeholder="Type name..." oninput="loadTeacherDashboard()" />
-        </div>
-        <button class="btn btn-secondary" onclick="loadTeacherDashboard()">Refresh</button>
-      </div>
-
-      <table class="teacher-table" id="teacherTable"></table>
-      <div class="footer-note">
-        This version saves progress to Firebase Firestore, so different devices can use the same student name and class.
-      </div>
+    <div id="teacherLeaderboard"></div>
+    <div style="margin-top:18px;">
+      <div style="font-weight:900;margin-bottom:10px;">Learning Heatmap</div>
+      <div id="heatmap"></div>
     </div>
   </div>
+</div>
 
-  <div id="celebrationOverlay" class="celebration-overlay">
-    <div class="celebration-card">
-      <div class="confetti-wrap" id="confettiWrap"></div>
-      <div class="celebration-icons">🎉 🏆 🪙</div>
-      <h2 id="celebrationTitle">Table Unlocked!</h2>
-      <p id="celebrationText">Amazing work.</p>
-      <button class="btn btn-primary" onclick="closeCelebration()">Awesome!</button>
-    </div>
+<div id="overlay" class="overlay">
+  <div class="modal">
+    <div id="confettiWrap" class="confetti-wrap"></div>
+    <div id="modalIcon" style="font-size:34px;margin-bottom:10px;">🎉</div>
+    <h2 id="modalTitle">Unlocked!</h2>
+    <p id="modalText">Great work.</p>
+    <button class="btn btn-primary" onclick="closeModal()">Awesome!</button>
   </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      getDoc,
-      getDocs,
-      collection,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, getDoc, getDocs, collection, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDjql80paWm_GGDfPEDno-qGEntvVkdaf8",
-      authDomain: "multiplication-master-af330.firebaseapp.com",
-      projectId: "multiplication-master-af330",
-      storageBucket: "multiplication-master-af330.firebasestorage.app",
-      messagingSenderId: "211712026574",
-      appId: "1:211712026574:web:2ec75e6bcc0d3cfd2ded9f"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyDjql80paWm_GGDfPEDno-qGEntvVkdaf8",
+  authDomain: "multiplication-master-af330.firebaseapp.com",
+  projectId: "multiplication-master-af330",
+  storageBucket: "multiplication-master-af330.firebasestorage.app",
+  messagingSenderId: "211712026574",
+  appId: "1:211712026574:web:2ec75e6bcc0d3cfd2ded9f"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+const WORLDS = [
+  {table:2, icon:"🌱", name:"Forest", boss:"Tiny Goblin"},
+  {table:3, icon:"🏝", name:"Island", boss:"Forest Beast"},
+  {table:4, icon:"⛰", name:"Mountain", boss:"Stone Golem"},
+  {table:5, icon:"🏜", name:"Desert", boss:"Pirate Captain"},
+  {table:6, icon:"🌋", name:"Volcano", boss:"Jungle Tiger"},
+  {table:7, icon:"🐉", name:"Dragon Valley", boss:"Ninja Master"},
+  {table:8, icon:"🌌", name:"Galaxy Gate", boss:"Dragon"},
+  {table:9, icon:"🧙", name:"Wizard Tower", boss:"Shadow Wizard"},
+  {table:10, icon:"⚙", name:"Robot Factory", boss:"Robot King"},
+  {table:11, icon:"👑", name:"Math Kingdom", boss:"Galaxy Guardian"},
+  {table:12, icon:"🏆", name:"Grand Palace", boss:"Math Emperor"}
+];
 
-    const METHODS = [
-      { key: "repeatedAddition", name: "Repeated Addition", desc: "Understand multiplication as equal groups.", difficulty: "Easy" },
-      { key: "arrayMethod", name: "Array Method", desc: "See rows and columns clearly.", difficulty: "Easy" },
-      { key: "numberLine", name: "Number Line", desc: "Use equal jumps to find the answer.", difficulty: "Easy" },
-      { key: "doublingStrategy", name: "Doubling Strategy", desc: "Use doubles to think faster.", difficulty: "Easy-Medium" },
-      { key: "multipleChoice", name: "Multiple Choice", desc: "Pick the correct answer.", difficulty: "Medium" },
-      { key: "trueFalse", name: "True or False", desc: "Check if the multiplication sentence is correct.", difficulty: "Medium" },
-      { key: "fillBlank", name: "Fill in the Blank", desc: "Recall the answer by yourself.", difficulty: "Medium" },
-      { key: "missingEquation", name: "Missing Equation", desc: "Find the missing factor.", difficulty: "Medium-Hard" },
-      { key: "dragDrop", name: "Drag & Drop", desc: "Really drag the answer into place.", difficulty: "Hard" },
-      { key: "wordProblems", name: "Word Problems", desc: "Apply multiplication in stories.", difficulty: "Hard" }
-    ];
+const METHODS = [
+  { key:"repeatedAddition", name:"Repeated Addition", difficulty:"Easy" },
+  { key:"arrayMethod", name:"Array Method", difficulty:"Easy" },
+  { key:"numberLine", name:"Number Line", difficulty:"Easy" },
+  { key:"doublingStrategy", name:"Doubling Strategy", difficulty:"Easy-Medium" },
+  { key:"multipleChoice", name:"Multiple Choice", difficulty:"Medium" },
+  { key:"trueFalse", name:"True or False", difficulty:"Medium" },
+  { key:"fillBlank", name:"Fill in the Blank", difficulty:"Medium" },
+  { key:"missingEquation", name:"Missing Equation", difficulty:"Medium-Hard" },
+  { key:"dragDrop", name:"Drag & Drop", difficulty:"Hard" },
+  { key:"wordProblems", name:"Word Problems", difficulty:"Hard" }
+];
 
-    const TABLES = [2,3,4,5,6,7,8,9,10,11,12];
+const SHOP_ITEMS = [
+  { id:"avatar_blue", type:"avatar", name:"Blue Hero", price:20, preview:"🙂", previewClass:"avatar-blue", avatarEmoji:"🙂" },
+  { id:"avatar_ninja", type:"avatar", name:"Math Ninja", price:50, preview:"🥷", previewClass:"avatar-ninja", avatarEmoji:"🥷" },
+  { id:"avatar_robot", type:"avatar", name:"Robot Kid", price:80, preview:"🤖", previewClass:"avatar-robot", avatarEmoji:"🤖" },
+  { id:"frame_bronze", type:"frame", name:"Bronze Ring", price:20, preview:"🖼️", previewClass:"frame-bronze" },
+  { id:"frame_rainbow", type:"frame", name:"Rainbow Glow", price:60, preview:"🌈", previewClass:"frame-rainbow" },
+  { id:"frame_champion", type:"frame", name:"Champion Edge", price:100, preview:"🏆", previewClass:"frame-champion" },
+  { id:"bg_sky", type:"background", name:"Sky Blue", price:30, preview:"☁️", previewClass:"bg-sky", themeClass:"bg-sky-theme" },
+  { id:"bg_jungle", type:"background", name:"Jungle Math", price:70, preview:"🌿", previewClass:"bg-jungle", themeClass:"bg-jungle-theme" },
+  { id:"bg_galaxy", type:"background", name:"Galaxy Quest", price:120, preview:"🌌", previewClass:"bg-galaxy", themeClass:"bg-galaxy-theme" },
+  { id:"title_explorer", type:"title", name:"Table Explorer", price:25, preview:"Explorer" },
+  { id:"title_ninja", type:"title", name:"Number Ninja", price:60, preview:"Ninja" },
+  { id:"title_master", type:"title", name:"Multiplication Master", price:120, preview:"Master" },
+  { id:"sticker_fire", type:"sticker", name:"Fire Mind", price:25, preview:"🔥" },
+  { id:"sticker_brain", type:"sticker", name:"Brain Power", price:35, preview:"🧠" },
+  { id:"sticker_speed", type:"sticker", name:"Speed Solver", price:45, preview:"⚡" }
+];
 
-    const SHOP_ITEMS = [
-      { id: "avatar_blue", type: "avatar", name: "Blue Hero", price: 20, preview: "🙂", previewClass: "avatar-blue", avatarEmoji: "🙂" },
-      { id: "avatar_ninja", type: "avatar", name: "Math Ninja", price: 50, preview: "🥷", previewClass: "avatar-ninja", avatarEmoji: "🥷" },
-      { id: "avatar_robot", type: "avatar", name: "Robot Kid", price: 80, preview: "🤖", previewClass: "avatar-robot", avatarEmoji: "🤖" },
-      { id: "frame_bronze", type: "frame", name: "Bronze Ring", price: 20, preview: "🖼️", previewClass: "frame-bronze" },
-      { id: "frame_rainbow", type: "frame", name: "Rainbow Glow", price: 60, preview: "🌈", previewClass: "frame-rainbow" },
-      { id: "frame_champion", type: "frame", name: "Champion Edge", price: 100, preview: "🏆", previewClass: "frame-champion" },
-      { id: "bg_sky", type: "background", name: "Sky Blue", price: 30, preview: "☁️", previewClass: "bg-sky", themeClass: "bg-sky-theme" },
-      { id: "bg_jungle", type: "background", name: "Jungle Math", price: 70, preview: "🌿", previewClass: "bg-jungle", themeClass: "bg-jungle-theme" },
-      { id: "bg_galaxy", type: "background", name: "Galaxy Quest", price: 120, preview: "🌌", previewClass: "bg-galaxy", themeClass: "bg-galaxy-theme" },
-      { id: "title_explorer", type: "title", name: "Table Explorer", price: 25, preview: "Explorer", previewClass: "" },
-      { id: "title_ninja", type: "title", name: "Number Ninja", price: 60, preview: "Ninja", previewClass: "" },
-      { id: "title_master", type: "title", name: "Multiplication Master", price: 120, preview: "Master", previewClass: "" }
-    ];
+let state = {
+  currentStudentId:null,
+  currentStudent:null,
+  selectedTable:null,
+  selectedMethod:null,
+  quizQuestions:[],
+  quizIndex:0,
+  quizScore:0,
+  quizStars:0,
+  quizCoins:0,
+  bossMode:false
+};
 
-    let state = {
-      currentStudentId: null,
-      currentStudent: null,
-      selectedTable: null,
-      selectedMethod: null,
-      quizQuestions: [],
-      quizIndex: 0,
-      quizScore: 0,
-      quizStars: 0,
-      quizCoins: 0
-    };
+function studentId(name, studentClass){
+  return `${name.trim().toLowerCase().replace(/\s+/g,"-")}__${studentClass.trim().toLowerCase().replace(/\s+/g,"-")}`;
+}
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function worldMultiplier(table){
+  return ({2:1,3:1.2,4:1.5,5:2,6:2.5,7:3,8:3.5,9:4,10:4.5,11:5,12:6})[table] || 1;
+}
+function completionBonus(table){
+  return ({2:20,3:25,4:35,5:50,6:60,7:80,8:100,9:120,10:150,11:180,12:250})[table] || 20;
+}
+function defaultStudent(name, studentClass){
+  const completedMethods = {}, accuracies = {}, bosses = {}, chests = {};
+  WORLDS.forEach(w => {
+    completedMethods[w.table] = [];
+    accuracies[w.table] = {correct:0, total:0};
+    bosses[w.table] = false;
+    chests[w.table] = false;
+  });
+  return {
+    id: studentId(name, studentClass),
+    name, studentClass,
+    stars:0, coins:0, streak:0,
+    lastActiveDate:null, streakBonusClaimedDate:null,
+    highestUnlockedTable:2,
+    completedMethods, accuracies, bosses, chests,
+    inventory:{owned:[], equipped:{avatar:null,frame:null,background:null,title:null,sticker:null}},
+    dailyChallenge:{date:todayKey(), target:10, progress:0, reward:15, claimed:false},
+    updatedAt:null, createdAt:null
+  };
+}
+function normalizeStudent(s){
+  if (!s.completedMethods) s.completedMethods = {};
+  if (!s.accuracies) s.accuracies = {};
+  if (!s.bosses) s.bosses = {};
+  if (!s.chests) s.chests = {};
+  WORLDS.forEach(w => {
+    if (!Array.isArray(s.completedMethods[w.table])) s.completedMethods[w.table] = [];
+    if (!s.accuracies[w.table]) s.accuracies[w.table] = {correct:0,total:0};
+    if (typeof s.bosses[w.table] !== "boolean") s.bosses[w.table] = false;
+    if (typeof s.chests[w.table] !== "boolean") s.chests[w.table] = false;
+  });
+  if (typeof s.coins !== "number") s.coins = 0;
+  if (typeof s.stars !== "number") s.stars = 0;
+  if (typeof s.streak !== "number") s.streak = 0;
+  if (!s.inventory) s.inventory = {owned:[], equipped:{avatar:null,frame:null,background:null,title:null,sticker:null}};
+  if (!Array.isArray(s.inventory.owned)) s.inventory.owned = [];
+  if (!s.inventory.equipped) s.inventory.equipped = {avatar:null,frame:null,background:null,title:null,sticker:null};
+  ["avatar","frame","background","title","sticker"].forEach(k => { if (!(k in s.inventory.equipped)) s.inventory.equipped[k] = null; });
+  if (!s.dailyChallenge || s.dailyChallenge.date !== todayKey()){
+    s.dailyChallenge = {date:todayKey(), target:10, progress:0, reward:15, claimed:false};
+  }
+  return s;
+}
+async function saveStudent(){
+  if (!state.currentStudentId || !state.currentStudent) return;
+  await setDoc(doc(db, "students", state.currentStudentId), {
+    ...state.currentStudent,
+    updatedAt: serverTimestamp(),
+    createdAt: state.currentStudent.createdAt || serverTimestamp()
+  }, {merge:true});
+}
+function getItem(id){ return SHOP_ITEMS.find(i => i.id === id) || null; }
+function owned(id){ return !!state.currentStudent?.inventory?.owned?.includes(id); }
+function equipped(type){ return state.currentStudent?.inventory?.equipped?.[type] || null; }
 
-    function makeStudentId(name, studentClass){
-      return `${name.trim().toLowerCase().replace(/\s+/g, "-")}__${studentClass.trim().toLowerCase().replace(/\s+/g, "-")}`;
-    }
+function maybeUpdateStreak(student){
+  const today = todayKey();
+  if (!student.lastActiveDate){
+    student.streak = 1;
+    student.lastActiveDate = today;
+    student.streakBonusClaimedDate = null;
+    return;
+  }
+  const last = new Date(student.lastActiveDate + "T00:00:00");
+  const now = new Date(today + "T00:00:00");
+  const diff = Math.round((now - last) / 86400000);
+  if (diff === 1) student.streak += 1;
+  else if (diff > 1) student.streak = 1;
+  student.lastActiveDate = today;
+  if (diff !== 0) student.streakBonusClaimedDate = null;
+}
+function claimStreakBonus(student){
+  const today = todayKey();
+  if (student.streakBonusClaimedDate === today) return 0;
+  const bonus = Math.min(3 + ((Math.max(1, student.streak)-1) * 2), 7);
+  student.coins += bonus;
+  student.streakBonusClaimedDate = today;
+  return bonus;
+}
 
-    function todayKey(){
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    }
+window.loginStudent = async function(){
+  const name = document.getElementById("studentName").value.trim();
+  const studentClass = document.getElementById("studentClass").value.trim();
+  if (!name || !studentClass) { alert("Please enter student name and class."); return; }
 
-    function defaultInventory(){
-      return {
-        owned: [],
-        equipped: {
-          avatar: null,
-          frame: null,
-          background: null,
-          title: null
-        }
-      };
-    }
+  const id = studentId(name, studentClass);
+  const snap = await getDoc(doc(db, "students", id));
+  state.currentStudent = snap.exists() ? normalizeStudent(snap.data()) : defaultStudent(name, studentClass);
+  state.currentStudentId = id;
+  maybeUpdateStreak(state.currentStudent);
+  const bonus = claimStreakBonus(state.currentStudent);
+  await saveStudent();
 
-    function defaultStudent(name, studentClass){
-      const completed = {};
-      TABLES.forEach(t => completed[t] = []);
-      return {
-        id: makeStudentId(name, studentClass),
-        name,
-        studentClass,
-        stars: 0,
-        coins: 0,
-        totalCorrect: 0,
-        totalAnswered: 0,
-        highestUnlockedTable: 2,
-        completedMethods: completed,
-        lastPlayedTable: 2,
-        inventory: defaultInventory(),
-        streak: 0,
-        lastActiveDate: null,
-        streakBonusClaimedDate: null,
-        updatedAt: null,
-        createdAt: null
-      };
-    }
+  document.getElementById("loginStatus").innerHTML = `<span class="success">Logged in:</span> ${state.currentStudent.name} (${state.currentStudent.studentClass})${bonus ? ` • streak bonus +${bonus} coins` : ""}`;
+  renderAll();
+  await loadLeaderboard();
+  await loadTeacherDashboard();
+  showSection('worldsSection');
+};
 
-    function normalizeStudent(student){
-      if (!student.completedMethods) student.completedMethods = {};
-      TABLES.forEach(t => {
-        if (!Array.isArray(student.completedMethods[t])) student.completedMethods[t] = [];
-      });
-      if (typeof student.coins !== "number") student.coins = 0;
-      if (!student.inventory) student.inventory = defaultInventory();
-      if (!Array.isArray(student.inventory.owned)) student.inventory.owned = [];
-      if (!student.inventory.equipped) student.inventory.equipped = defaultInventory().equipped;
-      ["avatar","frame","background","title"].forEach(k => {
-        if (!(k in student.inventory.equipped)) student.inventory.equipped[k] = null;
-      });
-      if (typeof student.streak !== "number") student.streak = 0;
-      if (!("lastActiveDate" in student)) student.lastActiveDate = null;
-      if (!("streakBonusClaimedDate" in student)) student.streakBonusClaimedDate = null;
-      return student;
-    }
+function renderAll(){
+  renderProfile();
+  renderWorldMap();
+  renderShop();
+}
+function renderProfile(){
+  const s = state.currentStudent;
+  const box = document.getElementById("profileBox");
+  const streakBox = document.getElementById("streakBox");
+  const challengeBox = document.getElementById("challengeBox");
+  const currentBox = document.getElementById("currentStudentBox");
+  const shopCoins = document.getElementById("shopCoins");
 
-    async function saveCurrentStudent(){
-      if (!state.currentStudentId || !state.currentStudent) return;
-      const payload = {
-        ...state.currentStudent,
-        updatedAt: serverTimestamp(),
-        createdAt: state.currentStudent.createdAt || serverTimestamp()
-      };
-      await setDoc(doc(db, "students", state.currentStudentId), payload, { merge: true });
-    }
+  if (!s){
+    box.classList.add("hidden"); streakBox.classList.add("hidden"); challengeBox.classList.add("hidden");
+    currentBox.textContent = "No student yet";
+    shopCoins.textContent = "🪙 0 coins";
+    document.getElementById("heroCard").classList.remove("bg-sky-theme","bg-jungle-theme","bg-galaxy-theme");
+    return;
+  }
 
-    async function saveStudentRecord(student){
-      const payload = {
-        ...student,
-        updatedAt: serverTimestamp(),
-        createdAt: serverTimestamp()
-      };
-      await setDoc(doc(db, "students", student.id), payload, { merge: true });
-    }
+  const avatarItem = getItem(equipped("avatar"));
+  const frameItem = getItem(equipped("frame"));
+  const titleItem = getItem(equipped("title"));
+  const stickerItem = getItem(equipped("sticker"));
+  const bgItem = getItem(equipped("background"));
 
-    function getItem(itemId){
-      return SHOP_ITEMS.find(i => i.id === itemId) || null;
-    }
+  const avatar = document.getElementById("profileAvatar");
+  avatar.className = "avatar";
+  if (avatarItem?.previewClass) avatar.classList.add(avatarItem.previewClass);
+  if (frameItem?.previewClass) avatar.classList.add(frameItem.previewClass);
+  avatar.textContent = avatarItem?.avatarEmoji || "🙂";
+  document.getElementById("profileName").textContent = s.name;
+  document.getElementById("profileTitle").textContent = titleItem?.name || "No title equipped";
+  document.getElementById("profileSticker").textContent = stickerItem ? `Sticker: ${stickerItem.preview} ${stickerItem.name}` : "No sticker equipped";
+  document.getElementById("profileMeta").textContent = `${s.studentClass} • ⭐ ${s.stars} • 🪙 ${s.coins}`;
+  box.classList.remove("hidden");
 
-    function equippedItem(type){
-      return state.currentStudent?.inventory?.equipped?.[type] || null;
-    }
+  const hero = document.getElementById("heroCard");
+  hero.classList.remove("bg-sky-theme","bg-jungle-theme","bg-galaxy-theme");
+  if (bgItem?.themeClass) hero.classList.add(bgItem.themeClass);
 
-    function isOwned(itemId){
-      return !!state.currentStudent?.inventory?.owned?.includes(itemId);
-    }
+  streakBox.textContent = `🔥 ${s.streak} day streak`;
+  streakBox.classList.remove("hidden");
+  challengeBox.textContent = s.dailyChallenge.claimed
+    ? `✅ Daily challenge complete (+${s.dailyChallenge.reward} coins claimed)`
+    : `🎯 Daily challenge: ${s.dailyChallenge.progress}/${s.dailyChallenge.target} correct answers for +${s.dailyChallenge.reward} coins`;
+  challengeBox.classList.remove("hidden");
+  currentBox.textContent = `${s.name} • ⭐ ${s.stars} • 🪙 ${s.coins} • x${s.highestUnlockedTable}`;
+  shopCoins.textContent = `🪙 ${s.coins} coins`;
+}
 
-    function applyEquippedTheme(){
-      const heroCard = document.getElementById("heroCard");
-      heroCard.classList.remove("bg-sky-theme", "bg-jungle-theme", "bg-galaxy-theme");
-      if (!state.currentStudent) return;
-      const bg = getItem(equippedItem("background"));
-      if (bg?.themeClass) heroCard.classList.add(bg.themeClass);
-    }
+window.showSection = function(id){
+  if (id === 'worldsSection') {
+    document.getElementById('methodsSection').classList.add('hidden');
+    document.getElementById('quizSection').classList.add('hidden');
+  }
+  document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+};
 
-    function renderStreak(){
-      const box = document.getElementById("streakBox");
-      if (!state.currentStudent){
-        box.classList.add("hidden");
-        return;
-      }
-      const streak = state.currentStudent.streak || 0;
-      const bonus = Math.min(3 + ((Math.max(1, streak) - 1) * 2), 7);
-      box.innerHTML = `🔥 Daily streak: <b>${streak}</b> day${streak === 1 ? "" : "s"} • Next method today gives <b>+${bonus} bonus coins</b>`;
-      box.classList.remove("hidden");
-    }
+function renderWorldMap(){
+  const map = document.getElementById("worldMap");
+  map.innerHTML = "";
+  WORLDS.forEach(w => {
+    const doneCount = state.currentStudent ? state.currentStudent.completedMethods[w.table].length : 0;
+    const unlocked = state.currentStudent ? w.table <= state.currentStudent.highestUnlockedTable : w.table === 2;
+    const bossDone = state.currentStudent ? state.currentStudent.bosses[w.table] : false;
+    const allDone = doneCount === 10;
+    const chestDone = state.currentStudent ? state.currentStudent.chests[w.table] : false;
 
-    function renderCurrentStudentBox(){
-      const el = document.getElementById("currentStudentBox");
-      const shopCoins = document.getElementById("shopCoinsBox");
-      const profileStrip = document.getElementById("profileStrip");
+    const card = document.createElement("div");
+    card.className = "world-card" + (unlocked ? "" : " locked") + (allDone ? " done" : "");
+    card.innerHTML = `
+      <div class="pill">${unlocked ? (allDone ? "World Open" : "Unlocked") : "Locked"}</div>
+      <div class="world-icon">${w.icon}</div>
+      <div class="world-table">×${w.table}</div>
+      <div style="font-weight:800">${w.name}</div>
+      <div class="small">${doneCount}/10 methods complete</div>
+      <div class="progress"><span style="width:${doneCount*10}%"></span></div>
+      <div class="small">${bossDone ? "Boss defeated" : allDone ? "Boss ready" : "Boss locked"}</div>
+      <div class="small">${chestDone ? "Chest opened" : bossDone ? "Chest ready" : "Chest locked"}</div>
+    `;
+    if (unlocked) card.onclick = () => openWorld(w.table);
+    map.appendChild(card);
+  });
+}
 
-      if (!state.currentStudent){
-        el.textContent = "No student yet";
-        shopCoins.textContent = "🪙 0 coins";
-        profileStrip.classList.add("hidden");
-        applyEquippedTheme();
-        renderStreak();
-        return;
-      }
+function openWorld(table){
+  state.selectedTable = table;
+  const world = WORLDS.find(w => w.table === table);
+  document.getElementById("methodsTitle").textContent = `${world.icon} ${world.name} of ×${table}`;
+  renderMethods();
+  document.getElementById("methodsSection").classList.remove("hidden");
+  document.getElementById("quizSection").classList.add("hidden");
+  showSection("methodsSection");
+}
 
-      const title = getItem(equippedItem("title"))?.name || "";
-      el.textContent = `${state.currentStudent.name}${title ? " • " + title : ""} • ${state.currentStudent.studentClass} • ⭐ ${state.currentStudent.stars} • 🪙 ${state.currentStudent.coins}`;
-      shopCoins.textContent = `🪙 ${state.currentStudent.coins} coins`;
+function renderMethods(){
+  const grid = document.getElementById("methodsGrid");
+  grid.innerHTML = "";
+  const methodsDone = state.currentStudent.completedMethods[state.selectedTable];
+  METHODS.forEach((m, idx) => {
+    const done = methodsDone.includes(m.key);
+    const card = document.createElement("div");
+    card.className = "method-card" + (done ? " done" : "");
+    card.innerHTML = `
+      <div class="method-head">
+        <div class="method-order">${done ? "✓" : idx+1}</div>
+        <div class="pill">${m.difficulty}</div>
+      </div>
+      <h4 style="margin:12px 0 8px;font-size:20px;">${m.name}</h4>
+      <div class="small">${done ? "Completed" : "Tap to start"}</div>
+    `;
+    card.onclick = () => startMethod(m.key);
+    grid.appendChild(card);
+  });
 
-      const avatarItem = getItem(equippedItem("avatar"));
-      const frameItem = getItem(equippedItem("frame"));
+  const world = WORLDS.find(w => w.table === state.selectedTable);
+  const allMethods = methodsDone.length === 10;
+  const bossDone = state.currentStudent.bosses[state.selectedTable];
+  const chestDone = state.currentStudent.chests[state.selectedTable];
 
-      document.getElementById("profileName").textContent = state.currentStudent.name;
-      document.getElementById("profileTitle").textContent = title || "No title equipped";
-      document.getElementById("profileMeta").textContent = `${state.currentStudent.studentClass} • ⭐ ${state.currentStudent.stars} • 🪙 ${state.currentStudent.coins}`;
+  document.getElementById("bossSection").classList.toggle("hidden", !allMethods || bossDone);
+  document.getElementById("bossName").textContent = `${world.boss} • 10 HP`;
+  document.getElementById("bossBar").style.width = "100%";
 
-      const avatarEl = document.getElementById("profileAvatar");
-      avatarEl.className = "profile-avatar";
-      if (avatarItem?.previewClass) avatarEl.classList.add(avatarItem.previewClass);
-      if (frameItem?.previewClass) avatarEl.classList.add(frameItem.previewClass);
-      avatarEl.textContent = avatarItem?.avatarEmoji || "🙂";
-      profileStrip.classList.remove("hidden");
+  document.getElementById("chestSection").classList.toggle("hidden", !bossDone || chestDone);
+}
 
-      applyEquippedTheme();
-      renderStreak();
-    }
+function startMethod(methodKey){
+  state.selectedMethod = methodKey;
+  state.bossMode = false;
+  state.quizQuestions = generateQuestions(state.selectedTable, methodKey, 10, false);
+  state.quizIndex = 0; state.quizScore = 0; state.quizStars = 0; state.quizCoins = 0;
+  document.getElementById("quizTitle").textContent = `World ×${state.selectedTable} • ${METHODS.find(m => m.key===methodKey).name}`;
+  document.getElementById("quizStudent").textContent = state.currentStudent.name;
+  document.getElementById("quizWorld").textContent = `×${state.selectedTable}`;
+  document.getElementById("quizMode").textContent = METHODS.find(m => m.key===methodKey).name;
+  document.getElementById("methodsSection").classList.add("hidden");
+  document.getElementById("quizSection").classList.remove("hidden");
+  renderQuizQuestion();
+  showSection("quizSection");
+}
 
-    function maybeApplyDailyStreakLogin(student){
-      const today = todayKey();
-      if (!student.lastActiveDate){
-        student.streak = 1;
-        student.lastActiveDate = today;
-        return;
-      }
-      const last = new Date(student.lastActiveDate + "T00:00:00");
-      const now = new Date(today + "T00:00:00");
-      const diffDays = Math.round((now - last) / (1000*60*60*24));
-      if (diffDays === 0){
-        return;
-      } else if (diffDays === 1){
-        student.streak += 1;
-      } else {
-        student.streak = 1;
-      }
-      student.lastActiveDate = today;
-      student.streakBonusClaimedDate = null;
-    }
+window.startBossBattle = function(){
+  state.bossMode = true;
+  state.quizQuestions = generateQuestions(state.selectedTable, "boss", 10, true);
+  state.quizIndex = 0; state.quizScore = 0; state.quizStars = 0; state.quizCoins = 0;
+  document.getElementById("quizTitle").textContent = `⚔ Boss Battle • ×${state.selectedTable}`;
+  document.getElementById("quizStudent").textContent = state.currentStudent.name;
+  document.getElementById("quizWorld").textContent = `×${state.selectedTable}`;
+  document.getElementById("quizMode").textContent = "Boss Battle";
+  document.getElementById("methodsSection").classList.add("hidden");
+  document.getElementById("quizSection").classList.remove("hidden");
+  renderQuizQuestion();
+  showSection("quizSection");
+};
 
-    function claimDailyStreakBonusIfNeeded(student){
-      const today = todayKey();
-      if (student.streakBonusClaimedDate === today) return 0;
-      const streak = Math.max(1, student.streak || 1);
-      const bonus = Math.min(3 + ((streak - 1) * 2), 7);
-      student.coins += bonus;
-      student.streakBonusClaimedDate = today;
-      return bonus;
-    }
+window.backToMethods = function(){
+  document.getElementById("quizSection").classList.add("hidden");
+  document.getElementById("methodsSection").classList.remove("hidden");
+  renderMethods();
+  showSection("methodsSection");
+};
 
-    window.loginStudent = async function(){
-      const name = document.getElementById("studentName").value.trim();
-      const studentClass = document.getElementById("studentClass").value.trim();
+function renderQuizQuestion(){
+  const q = state.quizQuestions[state.quizIndex];
+  document.getElementById("quizProgress").textContent = `${state.quizIndex+1} / ${state.quizQuestions.length}`;
+  document.getElementById("quizScore").textContent = state.quizScore;
+  document.getElementById("quizStars").textContent = state.quizStars;
+  document.getElementById("quizCoins").textContent = state.quizCoins;
+  document.getElementById("quizFeedback").textContent = "Choose the best answer";
+  document.getElementById("questionMeta").textContent = q.meta || "";
+  document.getElementById("questionText").innerHTML = q.prompt;
+  const area = document.getElementById("answersArea");
+  area.innerHTML = "";
 
-      if (!name || !studentClass){
-        alert("Please enter student name and class.");
-        return;
-      }
+  if (q.type === "input"){
+    area.innerHTML = `<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;"><input id="typedAnswer" type="number" placeholder="Type answer" style="max-width:220px;margin:0;" /><button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button></div>`;
+    return;
+  }
+  if (q.type === "mcq"){
+    const wrap = document.createElement("div");
+    wrap.className = "answers";
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.textContent = opt;
+      btn.onclick = () => answerQuestion(opt);
+      wrap.appendChild(btn);
+    });
+    area.appendChild(wrap);
+    return;
+  }
+  if (q.type === "arrayVisual"){
+    area.innerHTML = buildArrayVisual(q) + `<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;"><input id="typedAnswer" type="number" placeholder="How many in total?" style="max-width:220px;margin:0;" /><button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button></div>`;
+    return;
+  }
+  if (q.type === "numberLineVisual"){
+    area.innerHTML = buildNumberLineVisual(q) + `<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;"><input id="typedAnswer" type="number" placeholder="Where do you land?" style="max-width:220px;margin:0;" /><button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button></div>`;
+    return;
+  }
+  if (q.type === "dragDropReal"){
+    area.innerHTML = buildDragDropVisual(q);
+    setupRealDragDrop();
+  }
+}
 
-      const studentId = makeStudentId(name, studentClass);
-      const studentRef = doc(db, "students", studentId);
-      const snap = await getDoc(studentRef);
+window.submitTypedAnswer = function(){
+  const val = document.getElementById("typedAnswer").value.trim();
+  if (val === "") return;
+  answerQuestion(val);
+};
 
-      if (snap.exists()){
-        state.currentStudent = normalizeStudent(snap.data());
-      } else {
-        state.currentStudent = defaultStudent(name, studentClass);
-      }
+window.submitDroppedAnswer = function(){
+  if (window.currentDroppedValue == null){
+    document.getElementById("quizFeedback").innerHTML = `<span class="danger">Drag an answer first.</span>`;
+    return;
+  }
+  answerQuestion(window.currentDroppedValue);
+};
 
-      maybeApplyDailyStreakLogin(state.currentStudent);
-      state.currentStudentId = studentId;
+function answerQuestion(answer){
+  const q = state.quizQuestions[state.quizIndex];
+  const correct = String(answer).trim() === String(q.correct).trim();
+  const acc = state.currentStudent.accuracies[state.selectedTable];
+  acc.total += 1;
 
-      const streakBonus = claimDailyStreakBonusIfNeeded(state.currentStudent);
+  if (correct){
+    state.quizScore += 1;
+    state.quizStars += state.bossMode ? 2 : 1;
+    state.quizCoins += Math.max(1, Math.round(worldMultiplier(state.selectedTable)));
+    acc.correct += 1;
+    state.currentStudent.dailyChallenge.progress = Math.min(state.currentStudent.dailyChallenge.target, state.currentStudent.dailyChallenge.progress + 1);
+    document.getElementById("quizFeedback").innerHTML = `<span class="success">Correct!</span>`;
+  } else {
+    document.getElementById("quizFeedback").innerHTML = `<span class="danger">Wrong.</span> Correct answer: ${q.correct}`;
+  }
 
-      if (!snap.exists()){
-        await saveStudentRecord(state.currentStudent);
-      } else {
-        await saveCurrentStudent();
-      }
+  if (state.bossMode){
+    const hp = Math.max(0, 10 - state.quizScore);
+    document.getElementById("bossBar").style.width = `${hp*10}%`;
+  }
 
-      document.getElementById("studentSummary").innerHTML =
-        `<span class="success">Logged in:</span> ${state.currentStudent.name} (${state.currentStudent.studentClass})${streakBonus ? ` • Daily streak bonus +${streakBonus} coins` : ""}`;
-
-      renderCurrentStudentBox();
-      renderTables();
-      renderShop();
-      await loadLeaderboard();
-      await loadTeacherDashboard();
-      showSection("tablesSection");
-    };
-
-    window.showSection = function(id){
-      const methods = document.getElementById("methodsSection");
-      const quiz = document.getElementById("quizSection");
-      if (id === "tablesSection"){
-        methods.classList.add("hidden");
-        quiz.classList.add("hidden");
-      }
-      document.getElementById(id).scrollIntoView({ behavior:"smooth", block:"start" });
-    };
-
-    function renderTables(){
-      const grid = document.getElementById("tablesGrid");
-      grid.innerHTML = "";
-
-      TABLES.forEach(table => {
-        const doneCount = state.currentStudent ? state.currentStudent.completedMethods[table].length : 0;
-        const unlocked = state.currentStudent ? table <= state.currentStudent.highestUnlockedTable : table === 2;
-
-        const card = document.createElement("div");
-        card.className = "table-card" + (unlocked ? "" : " locked");
-        card.innerHTML = `
-          <div class="tag ${unlocked ? "" : "locked"}">${unlocked ? "Unlocked" : "Locked"}</div>
-          <div class="table-number">×${table}</div>
-          <div class="muted">${doneCount}/10 methods complete</div>
-          <div class="progress"><span style="width:${doneCount*10}%"></span></div>
-          <div class="small">${unlocked ? "Tap to continue learning" : `Unlock by completing Table ${table-1}`}</div>
-          <div style="margin-top:12px;">
-            <button class="btn ${unlocked ? "btn-primary" : "btn-secondary"}" ${unlocked ? "" : "disabled"} style="width:100%">
-              ${unlocked ? "Open Table" : "Locked"}
-            </button>
-          </div>
-        `;
-        if (unlocked) card.addEventListener("click", () => openTable(table));
-        grid.appendChild(card);
-      });
-    }
-
-    function openTable(table){
-      if (!state.currentStudent){
-        alert("Please log in first.");
-        return;
-      }
-      if (table > state.currentStudent.highestUnlockedTable){
-        alert("This table is still locked.");
-        return;
-      }
-      state.selectedTable = table;
-      state.currentStudent.lastPlayedTable = table;
-      document.getElementById("methodsTitle").textContent = `Training Methods • Table ${table}`;
-      renderMethods();
-      document.getElementById("methodsSection").classList.remove("hidden");
-      document.getElementById("quizSection").classList.add("hidden");
-      document.getElementById("methodsSection").scrollIntoView({ behavior:"smooth" });
-      saveCurrentStudent();
-    }
-
-    function renderMethods(){
-      const grid = document.getElementById("methodsGrid");
-      grid.innerHTML = "";
-      METHODS.forEach((method, index) => {
-        const done = state.currentStudent.completedMethods[state.selectedTable].includes(method.key);
-        const card = document.createElement("div");
-        card.className = "method-card" + (done ? " done" : "");
-        card.innerHTML = `
-          <div class="method-head">
-            <div class="method-order">${done ? "✓" : index + 1}</div>
-            <div class="pill">${method.difficulty}</div>
-          </div>
-          <h4 style="margin:12px 0 8px;font-size:20px;">${method.name}</h4>
-          <div class="muted">${method.desc}</div>
-          <div class="small" style="margin-top:12px;">${done ? "Completed" : "Click to start"}</div>
-        `;
-        card.addEventListener("click", () => startMethod(method.key));
-        grid.appendChild(card);
-      });
-    }
-
-    window.backToMethods = async function(){
-      document.getElementById("quizSection").classList.add("hidden");
-      document.getElementById("methodsSection").classList.remove("hidden");
-      renderMethods();
-      renderTables();
-      renderShop();
-      await loadLeaderboard();
-      await loadTeacherDashboard();
-      document.getElementById("methodsSection").scrollIntoView({ behavior:"smooth" });
-    };
-
-    function startMethod(methodKey){
-      if (!state.currentStudent || !state.selectedTable) return;
-      state.selectedMethod = methodKey;
-      state.quizQuestions = generateQuestions(state.selectedTable, methodKey, 10);
-      state.quizIndex = 0;
-      state.quizScore = 0;
-      state.quizStars = 0;
-      state.quizCoins = 0;
-
-      document.getElementById("quizTitle").textContent =
-        `Table ${state.selectedTable} • ${METHODS.find(m => m.key === methodKey).name}`;
-
-      document.getElementById("quizStudent").textContent = state.currentStudent.name;
-      document.getElementById("quizTable").textContent = "×" + state.selectedTable;
-      document.getElementById("quizMethod").textContent = METHODS.find(m => m.key === methodKey).name;
-      document.getElementById("quizSection").classList.remove("hidden");
-      document.getElementById("methodsSection").classList.add("hidden");
+  setTimeout(() => {
+    state.quizIndex += 1;
+    if (state.quizIndex < state.quizQuestions.length){
       renderQuizQuestion();
-      document.getElementById("quizSection").scrollIntoView({ behavior:"smooth" });
+    } else {
+      finishQuiz();
     }
+  }, 550);
+}
 
-    function renderQuizQuestion(){
-      const q = state.quizQuestions[state.quizIndex];
-      document.getElementById("quizProgress").textContent = `${state.quizIndex + 1} / ${state.quizQuestions.length}`;
-      document.getElementById("quizScore").textContent = state.quizScore;
-      document.getElementById("quizStars").textContent = state.quizStars;
-      document.getElementById("quizCoins").textContent = state.quizCoins;
-      document.getElementById("quizFeedback").textContent = "Choose the best answer";
-      document.getElementById("questionMeta").textContent = q.meta || "";
-      document.getElementById("questionText").innerHTML = q.prompt || q.question;
+async function finishQuiz(){
+  let extra = "";
+  let unlockNext = false;
 
-      const area = document.getElementById("answersArea");
-      area.innerHTML = "";
+  state.currentStudent.stars += state.quizStars;
+  state.currentStudent.coins += state.quizCoins;
 
-      if (q.type === "input"){
-        area.innerHTML = `
-          <div class="visual-answer-row">
-            <input id="typedAnswer" type="number" placeholder="Type answer" />
-            <button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button>
-          </div>
-        `;
-        return;
-      }
-
-      if (q.type === "mcq"){
-        const wrap = document.createElement("div");
-        wrap.className = "answers";
-        q.options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.className = "answer-btn";
-          btn.innerHTML = opt;
-          btn.onclick = () => answerQuestion(opt);
-          wrap.appendChild(btn);
-        });
-        area.appendChild(wrap);
-        return;
-      }
-
-      if (q.type === "arrayVisual"){
-        area.innerHTML = buildArrayVisual(q);
-        area.insertAdjacentHTML("beforeend", `
-          <div class="visual-answer-row">
-            <input id="typedAnswer" type="number" placeholder="How many in total?" />
-            <button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button>
-          </div>
-        `);
-        return;
-      }
-
-      if (q.type === "numberLineVisual"){
-        area.innerHTML = buildNumberLineVisual(q);
-        area.insertAdjacentHTML("beforeend", `
-          <div class="visual-answer-row">
-            <input id="typedAnswer" type="number" placeholder="Where do you land?" />
-            <button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button>
-          </div>
-        `);
-        return;
-      }
-
-      if (q.type === "dragDropReal"){
-        area.innerHTML = buildDragDropVisual(q);
-        setupRealDragDrop();
-      }
+  if (!state.bossMode){
+    const methodsDone = state.currentStudent.completedMethods[state.selectedTable];
+    if (!methodsDone.includes(state.selectedMethod)){
+      methodsDone.push(state.selectedMethod);
+      state.currentStudent.coins += Math.round(5 * worldMultiplier(state.selectedTable));
+      extra += `<div class="success" style="margin-top:8px;">First-time method bonus applied.</div>`;
+    } else {
+      extra += `<div class="small" style="margin-top:8px;">Repeat play: no extra method bonus.</div>`;
     }
-
-    function buildArrayVisual(q){
-      let rowsHtml = "";
-      let delay = 0;
-      for (let r = 0; r < q.rows; r++){
-        let dots = "";
-        for (let c = 0; c < q.cols; c++){
-          dots += `<div class="array-dot" style="animation-delay:${delay}ms"></div>`;
-          delay += 70;
-        }
-        rowsHtml += `<div class="array-row">${dots}</div>`;
+  } else {
+    if (state.quizScore >= 7){
+      state.currentStudent.bosses[state.selectedTable] = true;
+      state.currentStudent.coins += Math.round(15 * worldMultiplier(state.selectedTable));
+      extra += `<div class="success" style="margin-top:8px;">Boss defeated! Boss reward added.</div>`;
+      if (state.selectedTable < 12 && state.currentStudent.highestUnlockedTable < state.selectedTable + 1){
+        state.currentStudent.highestUnlockedTable = state.selectedTable + 1;
+        state.currentStudent.coins += completionBonus(state.selectedTable);
+        state.currentStudent.stars += 10;
+        unlockNext = true;
       }
-      return `<div class="visual-board"><div class="array-wrap">${rowsHtml}</div><div class="array-caption">${q.rows} rows × ${q.cols} columns</div></div>`;
+    } else {
+      extra += `<div class="danger" style="margin-top:8px;">Boss survived. Score at least 7/10 to defeat it.</div>`;
     }
+  }
 
-    function buildNumberLineVisual(q){
-      const end = q.answer;
-      const step = q.step;
-      const jumps = q.jumps;
-      const width = 620, startX = 40, endX = 580, y = 90, usable = endX - startX;
-      const points = [];
-      for (let i = 0; i <= jumps; i++){
-        const value = i * step;
-        const x = startX + (usable * value / end);
-        points.push({ x, value });
-      }
+  if (!state.currentStudent.dailyChallenge.claimed && state.currentStudent.dailyChallenge.progress >= state.currentStudent.dailyChallenge.target){
+    state.currentStudent.coins += state.currentStudent.dailyChallenge.reward;
+    state.currentStudent.dailyChallenge.claimed = true;
+    extra += `<div class="success" style="margin-top:8px;">Daily challenge complete! +${state.currentStudent.dailyChallenge.reward} coins</div>`;
+  }
 
-      let ticks = "";
-      points.forEach(p => {
-        ticks += `<line class="tick" x1="${p.x}" y1="${y-8}" x2="${p.x}" y2="${y+12}"></line>
-                  <text class="tick-label" x="${p.x}" y="${y+34}" text-anchor="middle">${p.value}</text>`;
-      });
+  await saveStudent();
+  renderAll();
+  await loadLeaderboard();
+  await loadTeacherDashboard();
 
-      let jumpPaths = "";
-      for (let i = 0; i < points.length - 1; i++){
-        const p1 = points[i], p2 = points[i + 1];
-        const midX = (p1.x + p2.x) / 2, lift = 42;
-        jumpPaths += `<path class="jump-path" style="animation-delay:${i * 0.25}s"
-                      d="M ${p1.x} ${y} Q ${midX} ${y - lift} ${p2.x} ${y}"></path>`;
-      }
+  document.getElementById("questionMeta").textContent = "Round Finished";
+  document.getElementById("questionText").innerHTML = `
+    Great job, ${state.currentStudent.name}!<br><br>
+    <div style="font-size:22px;font-weight:700;">
+      Score: ${state.quizScore}/10<br>
+      Stars earned: ⭐ ${state.quizStars}<br>
+      Coins earned: 🪙 ${state.quizCoins}
+    </div>
+  `;
+  document.getElementById("answersArea").innerHTML = `
+    <div style="text-align:center;padding:22px;border:2px dashed #c7d8fb;border-radius:20px;background:#f8fbff;">
+      ${extra}
+      <div style="margin-top:12px;">
+        <button class="btn btn-primary" onclick="backToMethods()">Back to Methods</button>
+      </div>
+    </div>
+  `;
 
-      return `<div class="visual-board"><div class="numberline-wrap">
-                <svg class="numberline-svg" viewBox="0 0 ${width} 150" xmlns="http://www.w3.org/2000/svg">
-                  <line class="line-base" x1="${startX}" y1="${y}" x2="${endX}" y2="${y}"></line>
-                  ${ticks}${jumpPaths}
-                </svg>
-              </div></div>`;
+  if (unlockNext){
+    const next = state.selectedTable + 1;
+    const world = WORLDS.find(w => w.table === next);
+    showModal("🎉", `World ${world.icon} ×${next} Unlocked!`, `Amazing work. You finished the boss and unlocked ${world.name}. Bonus reward: +${completionBonus(state.selectedTable)} coins.`);
+  }
+}
+
+window.openTreasureChest = async function(){
+  if (!state.currentStudent || !state.currentStudent.bosses[state.selectedTable] || state.currentStudent.chests[state.selectedTable]) return;
+  const pool = [
+    {type:"coins", amount:20, text:"🪙 20 coins"},
+    {type:"coins", amount:35, text:"🪙 35 coins"},
+    {type:"item", itemId:"sticker_fire", text:"🔥 Sticker: Fire Mind"},
+    {type:"item", itemId:"sticker_brain", text:"🧠 Sticker: Brain Power"},
+    {type:"item", itemId:"avatar_ninja", text:"🥷 Avatar: Math Ninja"},
+    {type:"item", itemId:"title_explorer", text:"🏷 Title: Table Explorer"}
+  ];
+  const reward = pool[Math.floor(Math.random()*pool.length)];
+  if (reward.type === "coins"){
+    state.currentStudent.coins += reward.amount;
+  } else {
+    if (!state.currentStudent.inventory.owned.includes(reward.itemId)) {
+      state.currentStudent.inventory.owned.push(reward.itemId);
     }
+    const item = getItem(reward.itemId);
+    state.currentStudent.inventory.equipped[item.type] = reward.itemId;
+  }
+  state.currentStudent.chests[state.selectedTable] = true;
+  await saveStudent();
+  renderAll();
+  renderMethods();
+  showModal("🎁", "Treasure Chest Opened!", `You received ${reward.text}`);
+};
 
-    function buildDragDropVisual(q){
-      return `<div class="visual-board"><div class="dragdrop-wrap">
-        <div class="drag-equation">${q.left} × ${q.right} = <span id="dropAnswerText">?</span></div>
-        <div id="dropZone" class="drop-zone">Drop here</div>
-        <div class="drag-options">
-          ${q.options.map((opt, i) => `<div class="drag-chip" draggable="true" data-value="${opt}" id="dragChip${i}">${opt}</div>`).join("")}
+function showModal(icon, title, text){
+  document.getElementById("modalIcon").textContent = icon;
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalText").textContent = text;
+  createConfetti();
+  document.getElementById("overlay").classList.add("show");
+}
+window.closeModal = function(){ document.getElementById("overlay").classList.remove("show"); };
+
+function createConfetti(){
+  const wrap = document.getElementById("confettiWrap");
+  wrap.innerHTML = "";
+  const colors = ["#60a5fa","#fbbf24","#34d399","#fb7185","#a78bfa"];
+  for (let i=0;i<42;i++){
+    const el = document.createElement("div");
+    el.className = "confetti";
+    el.style.left = `${Math.random()*100}%`;
+    el.style.background = colors[i%colors.length];
+    el.style.animationDelay = `${Math.random()*.6}s`;
+    wrap.appendChild(el);
+  }
+}
+
+function buildArrayVisual(q){
+  let rowsHtml = "", delay=0;
+  for(let r=0;r<q.rows;r++){
+    let dots="";
+    for(let c=0;c<q.cols;c++){
+      dots += `<div class="array-dot" style="animation-delay:${delay}ms"></div>`;
+      delay += 60;
+    }
+    rowsHtml += `<div class="array-row">${dots}</div>`;
+  }
+  return `<div class="visual-board"><div class="array-wrap">${rowsHtml}</div><div class="small">${q.rows} rows × ${q.cols} columns</div></div>`;
+}
+function buildNumberLineVisual(q){
+  const end=q.answer, step=q.step, jumps=q.jumps, width=620, startX=40, endX=580, y=90, usable=endX-startX;
+  const points=[];
+  for(let i=0;i<=jumps;i++){ const value=i*step; const x=startX+(usable*value/end); points.push({x,value}); }
+  let ticks="", paths="";
+  points.forEach(p=>{ ticks += `<line class="tick" x1="${p.x}" y1="${y-8}" x2="${p.x}" y2="${y+12}"></line><text class="tick-label" x="${p.x}" y="${y+34}" text-anchor="middle">${p.value}</text>`; });
+  for(let i=0;i<points.length-1;i++){ const p1=points[i],p2=points[i+1],mid=(p1.x+p2.x)/2; paths += `<path class="jump-path" style="animation-delay:${i*0.25}s" d="M ${p1.x} ${y} Q ${mid} ${y-42} ${p2.x} ${y}"></path>`; }
+  return `<div class="visual-board"><div class="numberline-wrap"><svg class="numberline-svg" viewBox="0 0 ${width} 150"><line class="line-base" x1="${startX}" y1="${y}" x2="${endX}" y2="${y}"></line>${ticks}${paths}</svg></div></div>`;
+}
+function buildDragDropVisual(q){
+  return `<div class="visual-board"><div class="dragdrop-wrap">
+    <div class="drag-equation">${q.left} × ${q.right} = <span id="dropAnswerText">?</span></div>
+    <div id="dropZone" class="drop-zone">Drop here</div>
+    <div class="drag-options">${q.options.map((opt,i)=>`<div class="drag-chip" draggable="true" data-value="${opt}" id="dragChip${i}">${opt}</div>`).join("")}</div>
+    <button class="btn btn-primary" onclick="submitDroppedAnswer()">Check ✓</button>
+  </div></div>`;
+}
+function setupRealDragDrop(){
+  window.currentDroppedValue = null;
+  const dropZone = document.getElementById("dropZone");
+  const answerText = document.getElementById("dropAnswerText");
+  const chips = document.querySelectorAll(".drag-chip");
+  chips.forEach(chip => chip.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", chip.dataset.value);
+    e.dataTransfer.setData("chip-id", chip.id);
+  }));
+  dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("over"); });
+  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("over"));
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault(); dropZone.classList.remove("over");
+    const value = e.dataTransfer.getData("text/plain");
+    const chipId = e.dataTransfer.getData("chip-id");
+    window.currentDroppedValue = value;
+    answerText.textContent = value;
+    dropZone.textContent = "";
+    dropZone.appendChild(answerText);
+    chips.forEach(c => c.classList.remove("used"));
+    document.getElementById(chipId)?.classList.add("used");
+  });
+}
+
+function generateQuestions(table, methodKey, count, boss=false){
+  const qs = [];
+  for(let i=0;i<count;i++){
+    let multiplier = rand(1,12);
+    if (boss) multiplier = rand(6,12);
+    const answer = table * multiplier;
+
+    if (methodKey === "repeatedAddition"){
+      const repeated = Array(multiplier).fill(table).join(" + ");
+      qs.push({prompt:`${repeated} = ?`, correct:answer, type:"input", meta:`Repeated Addition • ×${table}`});
+    } else if (methodKey === "arrayMethod"){
+      qs.push({prompt:`Show ${multiplier} rows of ${table}. How many total?`, correct:answer, answer, rows:multiplier, cols:table, type:"arrayVisual", meta:`Array Method • ×${table}`});
+    } else if (methodKey === "numberLine"){
+      qs.push({prompt:`Jump ${multiplier} times in groups of ${table}. Where do you land?`, correct:answer, answer, step:table, jumps:multiplier, type:"numberLineVisual", meta:`Number Line • ×${table}`});
+    } else if (methodKey === "doublingStrategy"){
+      const half = Math.floor(table/2);
+      const text = table % 2 === 0 ? `If ${half} × ${multiplier} = ${half*multiplier}, what is ${table} × ${multiplier}?` : `${table} × ${multiplier} = ?`;
+      qs.push({prompt:text, correct:answer, options:shuffle([answer, answer+table, Math.max(1,answer-table), answer+1]), type:"mcq", meta:`Doubling Strategy • ×${table}`});
+    } else if (methodKey === "multipleChoice" || methodKey === "boss"){
+      qs.push({prompt:`${table} × ${multiplier} = ?`, correct:answer, options:shuffle([answer, answer+1, Math.max(1,answer-1), answer+table]), type:"mcq", meta: boss ? `Boss Attack • ×${table}` : `Multiple Choice • ×${table}`});
+    } else if (methodKey === "trueFalse"){
+      const shown = Math.random() < 0.5 ? answer : answer + rand(1,3);
+      qs.push({prompt:`${table} × ${multiplier} = ${shown}`, correct: shown === answer ? "True" : "False", options:["True","False"], type:"mcq", meta:`True or False • ×${table}`});
+    } else if (methodKey === "fillBlank"){
+      qs.push({prompt:`${table} × ${multiplier} = __`, correct:answer, type:"input", meta:`Fill in the Blank • ×${table}`});
+    } else if (methodKey === "missingEquation"){
+      qs.push({prompt:`${table} × __ = ${answer}`, correct:multiplier, type:"input", meta:`Missing Equation • ×${table}`});
+    } else if (methodKey === "dragDrop"){
+      qs.push({prompt:`Match: ${table} × ${multiplier} = ?`, correct:answer, left:table, right:multiplier, options:shuffle([answer, answer+10, Math.max(1,answer-5), Math.max(1,answer-1)]), type:"dragDropReal", meta:`Drag & Drop • ×${table}`});
+    } else if (methodKey === "wordProblems"){
+      const items = ["apples","books","pencils","stickers","balls"];
+      const item = items[rand(0,items.length-1)];
+      qs.push({prompt:`A pupil has ${multiplier} bags. Each bag has ${table} ${item}. How many ${item} altogether?`, correct:answer, options:shuffle([answer, answer+1, Math.max(1,answer-1), answer+table]), type:"mcq", meta:`Word Problem • ×${table}`});
+    }
+  }
+  return qs;
+}
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function shuffle(arr){ return [...arr].sort(() => Math.random()-0.5); }
+
+window.buyItem = async function(itemId){
+  if (!state.currentStudent){ alert("Please log in first."); return; }
+  const item = getItem(itemId);
+  if (!item) return;
+  if (owned(itemId)){
+    state.currentStudent.inventory.equipped[item.type] = itemId;
+    await saveStudent(); renderAll(); await loadLeaderboard(); await loadTeacherDashboard();
+    return;
+  }
+  if (state.currentStudent.coins < item.price){ alert("Not enough coins yet."); return; }
+  state.currentStudent.coins -= item.price;
+  state.currentStudent.inventory.owned.push(itemId);
+  state.currentStudent.inventory.equipped[item.type] = itemId;
+  await saveStudent();
+  renderAll();
+  await loadLeaderboard();
+  await loadTeacherDashboard();
+};
+
+function renderShop(){
+  const grid = document.getElementById("shopGrid");
+  const summary = document.getElementById("inventorySummary");
+  if (!state.currentStudent){
+    summary.textContent = "Login to view inventory.";
+    grid.innerHTML = `<div class="small">No student logged in yet.</div>`;
+    return;
+  }
+  const s = state.currentStudent;
+  summary.innerHTML = `Owned items: <b>${s.inventory.owned.length}</b> • Avatar: <b>${getItem(equipped("avatar"))?.name || "None"}</b> • Frame: <b>${getItem(equipped("frame"))?.name || "None"}</b> • Background: <b>${getItem(equipped("background"))?.name || "None"}</b> • Title: <b>${getItem(equipped("title"))?.name || "None"}</b> • Sticker: <b>${getItem(equipped("sticker"))?.name || "None"}</b>`;
+  grid.innerHTML = SHOP_ITEMS.map(item => {
+    const own = owned(item.id), equip = equipped(item.type) === item.id;
+    return `<div class="shop-item ${own ? "owned" : ""}">
+      <div class="item-preview ${item.previewClass || ""}">${item.preview}</div>
+      <div style="font-size:18px;font-weight:800;">${item.name}${own ? '<span class="owned-badge">Owned</span>' : ''}</div>
+      <div class="small" style="margin:6px 0 10px;">${item.type.charAt(0).toUpperCase()+item.type.slice(1)}</div>
+      <div class="pill" style="margin-bottom:12px;">🪙 ${item.price}</div>
+      <button class="btn ${equip ? "btn-green" : own ? "btn-secondary" : "btn-primary"}" style="width:100%" onclick="buyItem('${item.id}')">
+        ${equip ? "Equipped" : own ? "Equip" : "Buy"}
+      </button>
+    </div>`;
+  }).join("");
+}
+
+function renderPlayerCard(s, rank, highlight=false){
+  const avatarItem = getItem(s.inventory?.equipped?.avatar);
+  const frameItem = getItem(s.inventory?.equipped?.frame);
+  const titleItem = getItem(s.inventory?.equipped?.title);
+  const stickerItem = getItem(s.inventory?.equipped?.sticker);
+  const avatarEmoji = avatarItem?.avatarEmoji || "🙂";
+  return `
+    <div class="lb-row" style="${highlight ? 'background:#eff6ff;border-radius:16px;' : ''}">
+      <div class="lb-left">
+        <div class="lb-rank">${rank}</div>
+        <div class="lb-avatar ${avatarItem?.previewClass || ''} ${frameItem?.previewClass || ''}">${avatarEmoji}</div>
+        <div>
+          <div class="highlight-name">${s.name}</div>
+          <div class="small">${titleItem?.name || 'No title'} ${stickerItem ? '• ' + stickerItem.preview + ' ' + stickerItem.name : ''}</div>
         </div>
-        <button class="btn btn-primary" onclick="submitDroppedAnswer()">Check ✓</button>
-      </div></div>`;
-    }
+      </div>
+      <div style="text-align:right">
+        <div>⭐ ${s.stars || 0} • 🪙 ${s.coins || 0}</div>
+        <div class="small">×${s.highestUnlockedTable || 2} • ${accuracy(s)}%</div>
+      </div>
+    </div>
+  `;
+}
+function accuracy(s){
+  let correct=0,total=0;
+  Object.values(s.accuracies || {}).forEach(v => { correct += v.correct || 0; total += v.total || 0; });
+  return total ? Math.round((correct/total)*100) : 0;
+}
 
-    function setupRealDragDrop(){
-      window.currentDroppedValue = null;
-      const dropZone = document.getElementById("dropZone");
-      const answerText = document.getElementById("dropAnswerText");
-      const chips = document.querySelectorAll(".drag-chip");
+window.loadLeaderboard = async function(){
+  const top = document.getElementById("topLeaderboard");
+  const around = document.getElementById("aroundMe");
+  top.innerHTML = `<div class="small">Loading leaderboard...</div>`;
+  around.innerHTML = `<div class="small">Loading your rank...</div>`;
 
-      chips.forEach(chip => {
-        chip.addEventListener("dragstart", e => {
-          e.dataTransfer.setData("text/plain", chip.dataset.value);
-          e.dataTransfer.setData("chip-id", chip.id);
-        });
-      });
+  try{
+    const snap = await getDocs(collection(db, "students"));
+    let students = snap.docs.map(d => normalizeStudent(d.data()));
+    students.sort((a,b) => (b.stars||0)-(a.stars||0) || (b.highestUnlockedTable||2)-(a.highestUnlockedTable||2) || (a.name||"").localeCompare(b.name||""));
+    if (!students.length){ top.innerHTML = `<div class="small">No student data yet.</div>`; around.innerHTML = ""; return; }
 
-      dropZone.addEventListener("dragover", e => {
-        e.preventDefault();
-        dropZone.classList.add("over");
-      });
+    top.innerHTML = students.slice(0,3).map((s,i)=>renderPlayerCard(s,["🥇","🥈","🥉"][i], false)).join("");
 
-      dropZone.addEventListener("dragleave", () => dropZone.classList.remove("over"));
-
-      dropZone.addEventListener("drop", e => {
-        e.preventDefault();
-        dropZone.classList.remove("over");
-        const value = e.dataTransfer.getData("text/plain");
-        const chipId = e.dataTransfer.getData("chip-id");
-        window.currentDroppedValue = value;
-        answerText.textContent = value;
-        dropZone.textContent = "";
-        dropZone.appendChild(answerText);
-        chips.forEach(c => c.classList.remove("used"));
-        const usedChip = document.getElementById(chipId);
-        if (usedChip) usedChip.classList.add("used");
-      });
-    }
-
-    window.submitTypedAnswer = function(){
-      const val = document.getElementById("typedAnswer").value.trim();
-      if (val === "") return;
-      answerQuestion(val);
-    };
-
-    window.submitDroppedAnswer = function(){
-      if (window.currentDroppedValue == null){
-        document.getElementById("quizFeedback").innerHTML = `<span class="danger">Drag an answer first.</span>`;
-        return;
-      }
-      answerQuestion(window.currentDroppedValue);
-    };
-
-    function answerQuestion(answer){
-      window.currentDroppedValue = null;
-      const q = state.quizQuestions[state.quizIndex];
-      const correct = String(answer).trim() === String(q.correct).trim();
-      state.currentStudent.totalAnswered += 1;
-
-      if (correct){
-        state.quizScore += 1;
-        state.quizStars += 1;
-        state.quizCoins += 1;
-        state.currentStudent.totalCorrect += 1;
-        document.getElementById("quizFeedback").innerHTML = `<span class="success">Correct!</span>`;
+    if (state.currentStudent){
+      const idx = students.findIndex(s => s.id === state.currentStudent.id);
+      if (idx >= 0){
+        const slice = students.slice(Math.max(0,idx-2), Math.min(students.length, idx+3));
+        around.innerHTML = `<div style="font-weight:900;margin-bottom:8px;">Around You</div>` + slice.map((s, i) => renderPlayerCard(s, `#${Math.max(0,idx-2)+i+1}`, s.id === state.currentStudent.id)).join("");
       } else {
-        document.getElementById("quizFeedback").innerHTML =
-          `<span class="danger">Wrong.</span> Correct answer: ${q.correct}`;
+        around.innerHTML = `<div class="small">Your rank will appear after your first saved result.</div>`;
       }
-
-      document.getElementById("quizCoins").textContent = state.quizCoins;
-
-      setTimeout(() => {
-        state.quizIndex += 1;
-        if (state.quizIndex < state.quizQuestions.length){
-          renderQuizQuestion();
-        } else {
-          finishQuiz();
-        }
-      }, 650);
+    } else {
+      around.innerHTML = `<div class="small">Login to see your nearby rank.</div>`;
     }
+  }catch(err){
+    console.error(err);
+    top.innerHTML = `<div class="danger">Could not load leaderboard. Check Firestore rules.</div>`;
+    around.innerHTML = "";
+  }
+};
 
-    function createConfetti(){
-      const wrap = document.getElementById("confettiWrap");
-      wrap.innerHTML = "";
-      const colors = ["#60a5fa","#fbbf24","#34d399","#fb7185","#a78bfa"];
-      for (let i = 0; i < 42; i++){
-        const el = document.createElement("div");
-        el.className = "confetti";
-        el.style.left = `${Math.random() * 100}%`;
-        el.style.background = colors[i % colors.length];
-        el.style.animationDelay = `${Math.random() * .6}s`;
-        el.style.transform = `translateY(-30px) rotate(${Math.random()*180}deg)`;
-        wrap.appendChild(el);
-      }
-    }
+window.loadTeacherDashboard = async function(){
+  const teacherLb = document.getElementById("teacherLeaderboard");
+  const heatmap = document.getElementById("heatmap");
+  teacherLb.innerHTML = `<div class="small">Loading dashboard...</div>`;
+  heatmap.innerHTML = "";
 
-    function showCelebration(title, text){
-      document.getElementById("celebrationTitle").textContent = title;
-      document.getElementById("celebrationText").textContent = text;
-      createConfetti();
-      document.getElementById("celebrationOverlay").classList.add("show");
-    }
+  try{
+    const snap = await getDocs(collection(db, "students"));
+    let students = snap.docs.map(d => normalizeStudent(d.data()));
+    const filterClass = document.getElementById("filterClass").value || "All";
+    const search = (document.getElementById("teacherSearch").value || "").trim().toLowerCase();
+    if (filterClass !== "All") students = students.filter(s => s.studentClass === filterClass);
+    if (search) students = students.filter(s => (s.name||"").toLowerCase().includes(search));
+    students.sort((a,b) => (b.stars||0)-(a.stars||0) || (b.highestUnlockedTable||2)-(a.highestUnlockedTable||2));
+    if (!students.length){ teacherLb.innerHTML = `<div class="small">No data found.</div>`; return; }
 
-    window.closeCelebration = function(){
-      document.getElementById("celebrationOverlay").classList.remove("show");
-    };
+    teacherLb.innerHTML = students.slice(0,10).map((s,i)=>renderPlayerCard(s,`#${i+1}`,false)).join("");
 
-    async function finishQuiz(){
-      const perfect = state.quizScore === state.quizQuestions.length;
-      const methodsDone = state.currentStudent.completedMethods[state.selectedTable];
-      const firstTimeMethodCompletion = !methodsDone.includes(state.selectedMethod);
+    let header = `<div class="heatmap-grid">`;
+    header += `<div class="heatcell neutral">Student</div>`;
+    WORLDS.forEach(w => header += `<div class="heatcell neutral">×${w.table}</div>`);
+    header += `</div>`;
 
-      if (perfect){
-        state.quizStars += 5;
-        state.quizCoins += 5;
-      }
+    let rows = students.map(s => {
+      let row = `<div class="heatmap-grid" style="margin-top:6px;">`;
+      row += `<div class="heatcell neutral" style="text-align:left">${s.name}</div>`;
+      WORLDS.forEach(w => {
+        const a = s.accuracies[w.table];
+        const pct = a.total ? Math.round((a.correct/a.total)*100) : 0;
+        const cls = a.total === 0 ? "neutral" : pct >= 80 ? "green" : pct >= 50 ? "yellow" : "red";
+        row += `<div class="heatcell ${cls}">${a.total ? pct + '%' : '-'}</div>`;
+      });
+      row += `</div>`;
+      return row;
+    }).join("");
+    heatmap.innerHTML = header + rows;
+  }catch(err){
+    console.error(err);
+    teacherLb.innerHTML = `<div class="danger">Could not load dashboard. Check Firestore rules.</div>`;
+  }
+};
 
-      state.currentStudent.stars += state.quizStars;
-      state.currentStudent.coins += state.quizCoins;
-
-      let streakBonus = 0;
-      if (firstTimeMethodCompletion){
-        methodsDone.push(state.selectedMethod);
-        state.currentStudent.coins += 5;
-        streakBonus = claimDailyStreakBonusIfNeeded(state.currentStudent);
-      }
-
-      let unlockedNewTable = false;
-      if (methodsDone.length === 10 && state.selectedTable < 12){
-        if (state.currentStudent.highestUnlockedTable < state.selectedTable + 1){
-          state.currentStudent.highestUnlockedTable = state.selectedTable + 1;
-          state.currentStudent.stars += 10;
-          state.currentStudent.coins += 25;
-          unlockedNewTable = true;
-        }
-      }
-
-      await saveCurrentStudent();
-      renderCurrentStudentBox();
-      renderShop();
-
-      const methodName = METHODS.find(m => m.key === state.selectedMethod).name;
-      const displayCoins = state.quizCoins + (firstTimeMethodCompletion ? 5 : 0) + streakBonus;
-
-      document.getElementById("questionMeta").textContent = "Quiz Finished";
-      document.getElementById("questionText").innerHTML = `
-        Great job, ${state.currentStudent.name}!<br><br>
-        <div style="font-size:22px;font-weight:700;">
-          ${methodName} complete<br>
-          Score: ${state.quizScore}/10<br>
-          Stars earned: ⭐ ${state.quizStars}<br>
-          Coins earned: 🪙 ${displayCoins}
-        </div>
-      `;
-
-      let extra = "";
-      if (firstTimeMethodCompletion){
-        extra += `<div class="success" style="margin-top:10px;font-size:18px;">First-time method bonus: +5 coins</div>`;
-      } else {
-        extra += `<div class="small" style="margin-top:10px;font-size:15px;">Repeat play: no extra method bonus, so farming easy tables is limited.</div>`;
-      }
-      if (streakBonus){
-        extra += `<div class="success" style="margin-top:8px;font-size:17px;">Daily streak bonus: +${streakBonus} coins</div>`;
-      }
-      if (state.currentStudent.completedMethods[state.selectedTable].length === 10){
-        extra += `<div class="success" style="margin-top:10px;font-size:18px;">Table ${state.selectedTable} mastered!</div>`;
-        if (state.selectedTable < 12 && unlockedNewTable){
-          extra += `<div style="margin-top:8px;font-size:18px;">🔓 Table ${state.selectedTable + 1} unlocked + 25 coins</div>`;
-        } else if (state.selectedTable === 12){
-          extra += `<div style="margin-top:8px;font-size:18px;">👑 You finished all tables!</div>`;
-        }
-      }
-
-      document.getElementById("answersArea").innerHTML = `
-        <div class="big-center">
-          <div style="font-size:18px;margin-bottom:10px;">${extra}</div>
-          <button class="btn btn-primary" onclick="backToMethods()">Back to Methods</button>
-        </div>
-      `;
-
-      document.getElementById("quizScore").textContent = state.quizScore;
-      document.getElementById("quizStars").textContent = state.quizStars;
-      document.getElementById("quizCoins").textContent = displayCoins;
-      document.getElementById("quizFeedback").textContent = perfect ? "Perfect score bonus earned!" : "Method completed";
-
-      renderTables();
-      await loadLeaderboard();
-      await loadTeacherDashboard();
-
-      if (unlockedNewTable){
-        showCelebration(
-          `Table ${state.selectedTable + 1} Unlocked!`,
-          `${state.currentStudent.name} mastered Table ${state.selectedTable}. Big reward: +25 coins and a new table opened.`
-        );
-      }
-    }
-
-    function generateQuestions(table, methodKey, count){
-      const qs = [];
-      for (let i = 0; i < count; i++){
-        const multiplier = rand(1, 12);
-        const answer = table * multiplier;
-
-        if (methodKey === "repeatedAddition"){
-          const repeated = Array(multiplier).fill(table).join(" + ");
-          qs.push({ prompt: `${repeated} = ?`, correct: answer, type: "input", meta: `Repeated Addition • ×${table}` });
-        }
-
-        if (methodKey === "arrayMethod"){
-          qs.push({ prompt: `Show ${multiplier} rows of ${table}. How many total?`, correct: answer, answer, rows: multiplier, cols: table, type: "arrayVisual", meta: `🔵 Array Method • ×${table}` });
-        }
-
-        if (methodKey === "numberLine"){
-          qs.push({ prompt: `Jump ${multiplier} times in groups of ${table} on the number line. Where do you land?`, correct: answer, answer, step: table, jumps: multiplier, type: "numberLineVisual", meta: `📏 Number Line • ×${table}` });
-        }
-
-        if (methodKey === "doublingStrategy"){
-          const half = Math.floor(table / 2);
-          const questionText = table % 2 === 0
-            ? `If ${half} × ${multiplier} = ${half * multiplier}, what is ${table} × ${multiplier}?`
-            : `${table} × ${multiplier} = ?`;
-          qs.push({
-            prompt: questionText,
-            correct: answer,
-            options: shuffle([answer, answer + table, Math.max(1, answer - table), answer + 1]),
-            type: "mcq",
-            meta: `Doubling Strategy • ×${table}`
-          });
-        }
-
-        if (methodKey === "multipleChoice"){
-          qs.push({
-            prompt: `${table} × ${multiplier} = ?`,
-            correct: answer,
-            options: shuffle([answer, answer + 1, Math.max(1, answer - 1), answer + table]),
-            type: "mcq",
-            meta: `Multiple Choice • ×${table}`
-          });
-        }
-
-        if (methodKey === "trueFalse"){
-          const shown = Math.random() < 0.5 ? answer : answer + rand(1, 3);
-          qs.push({
-            prompt: `${table} × ${multiplier} = ${shown}`,
-            correct: shown === answer ? "True" : "False",
-            options: ["True", "False"],
-            type: "mcq",
-            meta: `True or False • ×${table}`
-          });
-        }
-
-        if (methodKey === "fillBlank"){
-          qs.push({ prompt: `${table} × ${multiplier} = __`, correct: answer, type: "input", meta: `Fill in the Blank • ×${table}` });
-        }
-
-        if (methodKey === "missingEquation"){
-          qs.push({ prompt: `${table} × __ = ${answer}`, correct: multiplier, type: "input", meta: `Missing Equation • ×${table}` });
-        }
-
-        if (methodKey === "dragDrop"){
-          qs.push({
-            prompt: `Match: ${table} × ${multiplier} = ?`,
-            correct: answer,
-            left: table,
-            right: multiplier,
-            options: shuffle([answer, answer + 10, Math.max(1, answer - 5), answer - 1 > 0 ? answer - 1 : answer + 3]),
-            type: "dragDropReal",
-            meta: `🎯 Drag & Drop • ×${table}`
-          });
-        }
-
-        if (methodKey === "wordProblems"){
-          const items = ["apples", "books", "pencils", "stickers", "balls"];
-          const item = items[rand(0, items.length - 1)];
-          qs.push({
-            prompt: `A pupil has ${multiplier} bags. Each bag has ${table} ${item}. How many ${item} are there altogether?`,
-            correct: answer,
-            options: shuffle([answer, answer + 1, Math.max(1, answer - 1), answer + table]),
-            type: "mcq",
-            meta: `Word Problem • ×${table}`
-          });
-        }
-      }
-      return qs;
-    }
-
-    window.buyItem = async function(itemId){
-      if (!state.currentStudent){
-        alert("Please log in first.");
-        return;
-      }
-      const item = getItem(itemId);
-      if (!item) return;
-
-      if (isOwned(itemId)){
-        state.currentStudent.inventory.equipped[item.type] = itemId;
-        await saveCurrentStudent();
-        renderCurrentStudentBox();
-        renderShop();
-        return;
-      }
-
-      if (state.currentStudent.coins < item.price){
-        alert("Not enough coins yet.");
-        return;
-      }
-
-      state.currentStudent.coins -= item.price;
-      state.currentStudent.inventory.owned.push(itemId);
-      state.currentStudent.inventory.equipped[item.type] = itemId;
-      await saveCurrentStudent();
-      renderCurrentStudentBox();
-      renderShop();
-    };
-
-    function renderShop(){
-      const grid = document.getElementById("shopGrid");
-      const summary = document.getElementById("inventorySummary");
-      renderCurrentStudentBox();
-
-      if (!state.currentStudent){
-        summary.textContent = "Login to view your inventory.";
-        grid.innerHTML = `<div class="small">No student logged in yet.</div>`;
-        return;
-      }
-
-      const inv = state.currentStudent.inventory;
-      const titleName = getItem(inv.equipped.title)?.name || "None";
-      const avatarName = getItem(inv.equipped.avatar)?.name || "None";
-      const frameName = getItem(inv.equipped.frame)?.name || "None";
-      const bgName = getItem(inv.equipped.background)?.name || "None";
-
-      summary.innerHTML = `
-        Owned items: <b>${inv.owned.length}</b> •
-        Equipped Avatar: <b>${avatarName}</b> •
-        Frame: <b>${frameName}</b> •
-        Background: <b>${bgName}</b> •
-        Title: <b>${titleName}</b>
-      `;
-
-      grid.innerHTML = SHOP_ITEMS.map(item => {
-        const owned = isOwned(item.id);
-        const equipped = equippedItem(item.type) === item.id;
-        return `
-          <div class="shop-item ${owned ? "owned" : ""}">
-            <div class="item-preview ${item.previewClass || ""}">${item.preview}</div>
-            <div style="font-size:18px;font-weight:800;">
-              ${item.name}
-              ${owned ? '<span class="owned-badge">Owned</span>' : ''}
-            </div>
-            <div class="muted" style="margin:6px 0 10px;">${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</div>
-            <div class="pill" style="margin-bottom:12px;">🪙 ${item.price}</div>
-            <div>
-              <button class="btn ${equipped ? "btn-green" : owned ? "btn-secondary" : "btn-primary"}" style="width:100%" onclick="buyItem('${item.id}')">
-                ${equipped ? "Equipped" : owned ? "Equip" : "Buy"}
-              </button>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderNameWithOwnership(s){
-      const avatar = getItem(s.inventory?.equipped?.avatar)?.avatarEmoji || "🙂";
-      const title = getItem(s.inventory?.equipped?.title)?.name || "";
-      return `${avatar} ${s.name || "-"}${title ? `<div class="small">${title}</div>` : ""}`;
-    }
-
-    window.loadLeaderboard = async function(){
-      const table = document.getElementById("leaderboardTable");
-      table.innerHTML = `<tr><td class="small">Loading leaderboard...</td></tr>`;
-
-      try {
-        const snap = await getDocs(collection(db, "students"));
-        let students = snap.docs.map(d => normalizeStudent(d.data()));
-
-        students.sort((a,b) => {
-          if ((b.stars || 0) !== (a.stars || 0)) return (b.stars || 0) - (a.stars || 0);
-          if ((b.highestUnlockedTable || 2) !== (a.highestUnlockedTable || 2)) return (b.highestUnlockedTable || 2) - (a.highestUnlockedTable || 2);
-          return (a.name || "").localeCompare(b.name || "");
-        });
-
-        if (!students.length){
-          table.innerHTML = `<tr><td class="small">No student data yet.</td></tr>`;
-          return;
-        }
-
-        table.innerHTML = `
-          <tr>
-            <td class="rank">#</td>
-            <td><b>Name</b></td>
-            <td><b>Class</b></td>
-            <td><b>Stars</b></td>
-            <td><b>Coins</b></td>
-            <td><b>Highest Table</b></td>
-            <td><b>Accuracy</b></td>
-          </tr>
-        ` + students.map((s, i) => {
-          const acc = s.totalAnswered ? Math.round((s.totalCorrect / s.totalAnswered) * 100) : 0;
-          return `
-            <tr>
-              <td class="rank">${i+1}</td>
-              <td>${renderNameWithOwnership(s)}</td>
-              <td>${s.studentClass || "-"}</td>
-              <td>⭐ ${s.stars || 0}</td>
-              <td>🪙 ${s.coins || 0}</td>
-              <td>×${s.highestUnlockedTable || 2}</td>
-              <td>${acc}%</td>
-            </tr>
-          `;
-        }).join("");
-      } catch (err) {
-        console.error(err);
-        table.innerHTML = `<tr><td class="danger">Could not load leaderboard. Check Firestore rules.</td></tr>`;
-      }
-    };
-
-    window.loadTeacherDashboard = async function(){
-      const table = document.getElementById("teacherTable");
-      table.innerHTML = `<tr><td class="small">Loading teacher dashboard...</td></tr>`;
-
-      try {
-        const snap = await getDocs(collection(db, "students"));
-        let students = snap.docs.map(d => normalizeStudent(d.data()));
-
-        const filterClass = document.getElementById("filterClass").value || "All";
-        const search = (document.getElementById("teacherStudentSearch").value || "").trim().toLowerCase();
-
-        if (filterClass !== "All"){
-          students = students.filter(s => s.studentClass === filterClass);
-        }
-        if (search){
-          students = students.filter(s => (s.name || "").toLowerCase().includes(search));
-        }
-
-        students.sort((a,b) => (b.highestUnlockedTable || 2) - (a.highestUnlockedTable || 2) || (b.stars || 0) - (a.stars || 0));
-
-        if (!students.length){
-          table.innerHTML = `<tr><td class="small">No data found.</td></tr>`;
-          return;
-        }
-
-        table.innerHTML = `
-          <tr>
-            <th>Student</th>
-            <th>Class</th>
-            <th>Highest Table</th>
-            <th>Methods Done</th>
-            <th>Stars</th>
-            <th>Coins</th>
-            <th>Accuracy</th>
-          </tr>
-          ${students.map(s => {
-            let done = 0;
-            TABLES.forEach(t => { done += Array.isArray(s.completedMethods?.[t]) ? s.completedMethods[t].length : 0; });
-            const acc = s.totalAnswered ? Math.round((s.totalCorrect / s.totalAnswered) * 100) : 0;
-            return `
-              <tr>
-                <td>${renderNameWithOwnership(s)}</td>
-                <td>${s.studentClass || "-"}</td>
-                <td>×${s.highestUnlockedTable || 2}</td>
-                <td>${done}/110</td>
-                <td>⭐ ${s.stars || 0}</td>
-                <td>🪙 ${s.coins || 0}</td>
-                <td>${acc}%</td>
-              </tr>
-            `;
-          }).join("")}
-        `;
-      } catch (err) {
-        console.error(err);
-        table.innerHTML = `<tr><td class="danger">Could not load teacher dashboard. Check Firestore rules.</td></tr>`;
-      }
-    };
-
-    function rand(min, max){
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function shuffle(arr){
-      return [...arr].sort(() => Math.random() - 0.5);
-    }
-
-    renderCurrentStudentBox();
-    renderTables();
-    renderShop();
-    loadLeaderboard();
-    loadTeacherDashboard();
-  </script>
+renderAll();
+loadLeaderboard();
+loadTeacherDashboard();
+</script>
 </body>
 </html>
