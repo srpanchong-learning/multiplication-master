@@ -20,7 +20,6 @@
       --shadow:0 12px 30px rgba(37,99,235,.10);
       --radius:22px;
     }
-
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
@@ -33,66 +32,19 @@
       color:var(--text);
       min-height:100vh;
     }
-
-    .app{
-      max-width:1220px;
-      margin:0 auto;
-      padding:20px;
-    }
-
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
+    .app{max-width:1220px;margin:0 auto;padding:20px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
     .logo{
-      width:56px;
-      height:56px;
-      border-radius:18px;
+      width:56px;height:56px;border-radius:18px;
       background:linear-gradient(135deg,var(--blue),var(--purple));
-      display:grid;
-      place-items:center;
-      color:#fff;
-      font-size:28px;
-      font-weight:700;
-      box-shadow:var(--shadow);
+      display:grid;place-items:center;color:#fff;font-size:28px;font-weight:700;box-shadow:var(--shadow)
     }
-
-    .brand h1{
-      margin:0;
-      font-size:28px;
-    }
-
-    .brand p{
-      margin:4px 0 0;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .top-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
+    .brand h1{margin:0;font-size:28px}
+    .brand p{margin:4px 0 0;color:var(--muted);font-size:14px}
+    .top-actions{display:flex;gap:10px;flex-wrap:wrap}
     .btn{
-      border:none;
-      border-radius:16px;
-      padding:12px 16px;
-      font-weight:700;
-      cursor:pointer;
-      transition:.2s;
-      font-size:14px;
+      border:none;border-radius:16px;padding:12px 16px;font-weight:700;cursor:pointer;transition:.2s;font-size:14px
     }
     .btn:hover{transform:translateY(-1px)}
     .btn-primary{background:var(--blue);color:#fff}
@@ -103,325 +55,72 @@
     .btn-red{background:var(--red);color:#fff}
     .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
 
-    .grid{
-      display:grid;
-      gap:18px;
-    }
-
-    .grid-hero{
-      grid-template-columns:1.05fr .95fr;
-      align-items:start;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
-    }
-
-    .hero-box{
-      background:linear-gradient(135deg,#eff6ff,#ffffff);
-      border:1px solid #dbeafe;
-      border-radius:24px;
-      padding:22px;
-    }
-
-    .hero-box h2{
-      margin:0 0 10px;
-      font-size:32px;
-      line-height:1.1;
-    }
-
-    .hero-box p{
-      margin:0 0 16px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .stat{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-      text-align:center;
-    }
-
-    .stat .n{
-      font-size:26px;
-      font-weight:800;
-      color:var(--blue);
-    }
-
-    label{
-      display:block;
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:6px;
-      font-weight:700;
-    }
-
+    .grid{display:grid;gap:18px}
+    .grid-hero{grid-template-columns:1.05fr .95fr;align-items:start}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .hero-box{background:linear-gradient(135deg,#eff6ff,#ffffff);border:1px solid #dbeafe;border-radius:24px;padding:22px}
+    .hero-box h2{margin:0 0 10px;font-size:32px;line-height:1.1}
+    .hero-box p{margin:0 0 16px;color:var(--muted);line-height:1.5}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}
+    .stat .n{font-size:26px;font-weight:800;color:var(--blue)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:700}
     input, select{
-      width:100%;
-      padding:12px 14px;
-      border-radius:14px;
-      border:2px solid #dbe7fb;
-      outline:none;
-      font-size:15px;
-      background:#fff;
-      margin-bottom:12px;
+      width:100%;padding:12px 14px;border-radius:14px;border:2px solid #dbe7fb;outline:none;
+      font-size:15px;background:#fff;margin-bottom:12px
     }
+    input:focus, select:focus{border-color:#93c5fd}
+    .section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .section-title h3{margin:0;font-size:24px}
+    .section-title p{margin:5px 0 0;color:var(--muted);font-size:14px}
 
-    input:focus, select:focus{
-      border-color:#93c5fd;
-    }
-
-    .section-title{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .section-title h3{
-      margin:0;
-      font-size:24px;
-    }
-
-    .section-title p{
-      margin:5px 0 0;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .tables{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
-      gap:14px;
-    }
-
+    .tables{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:14px}
     .table-card{
-      border-radius:20px;
-      padding:16px;
-      border:2px solid #dbeafe;
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      position:relative;
-      overflow:hidden;
+      border-radius:20px;padding:16px;border:2px solid #dbeafe;background:linear-gradient(180deg,#ffffff,#f8fbff);
+      position:relative;overflow:hidden
     }
+    .table-card.locked{opacity:.65;border-color:#e5e7eb;background:linear-gradient(180deg,#fafafa,#f3f4f6)}
+    .table-number{font-size:34px;font-weight:900;color:var(--blue);margin:6px 0}
+    .locked .table-number{color:#9ca3af}
+    .tag{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;font-weight:800;background:#dbeafe;color:var(--blue)}
+    .tag.locked{background:#e5e7eb;color:#6b7280}
+    .progress{width:100%;height:11px;background:#e5edfb;border-radius:999px;overflow:hidden;margin:10px 0 6px}
+    .progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:999px}
 
-    .table-card.locked{
-      opacity:.65;
-      border-color:#e5e7eb;
-      background:linear-gradient(180deg,#fafafa,#f3f4f6);
-    }
-
-    .table-number{
-      font-size:34px;
-      font-weight:900;
-      color:var(--blue);
-      margin:6px 0;
-    }
-
-    .locked .table-number{
-      color:#9ca3af;
-    }
-
-    .tag{
-      display:inline-block;
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:800;
-      background:#dbeafe;
-      color:var(--blue);
-    }
-
-    .tag.locked{
-      background:#e5e7eb;
-      color:#6b7280;
-    }
-
-    .progress{
-      width:100%;
-      height:11px;
-      background:#e5edfb;
-      border-radius:999px;
-      overflow:hidden;
-      margin:10px 0 6px;
-    }
-
-    .progress > span{
-      display:block;
-      height:100%;
-      background:linear-gradient(90deg,var(--blue),var(--green));
-      border-radius:999px;
-    }
-
-    .methods{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
-      gap:14px;
-    }
-
-    .method-card{
-      border:2px solid #dbeafe;
-      background:#fff;
-      border-radius:20px;
-      padding:16px;
-      cursor:pointer;
-      transition:.2s;
-    }
-
-    .method-card:hover{
-      transform:translateY(-2px);
-      box-shadow:0 10px 20px rgba(0,0,0,.06);
-    }
-
-    .method-card.done{
-      border-color:#bbf7d0;
-      background:#f0fdf4;
-    }
-
-    .method-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
+    .methods{display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:14px}
+    .method-card{border:2px solid #dbeafe;background:#fff;border-radius:20px;padding:16px;cursor:pointer;transition:.2s}
+    .method-card:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.06)}
+    .method-card.done{border-color:#bbf7d0;background:#f0fdf4}
+    .method-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .method-order{
-      width:38px;
-      height:38px;
-      border-radius:12px;
-      display:grid;
-      place-items:center;
-      background:#eff6ff;
-      color:var(--blue);
-      font-weight:900;
+      width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#eff6ff;color:var(--blue);font-weight:900
     }
+    .method-card.done .method-order{background:#10b981;color:#fff}
+    .muted{color:var(--muted);font-size:14px;line-height:1.45}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-weight:800;font-size:12px}
 
-    .method-card.done .method-order{
-      background:#10b981;
-      color:#fff;
-    }
-
-    .muted{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.45;
-    }
-
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#fef3c7;
-      color:#92400e;
-      font-weight:800;
-      font-size:12px;
-    }
-
-    .quiz-wrap{
-      display:grid;
-      grid-template-columns:1fr .9fr;
-      gap:18px;
-    }
-
+    .quiz-wrap{display:grid;grid-template-columns:1fr .9fr;gap:18px}
     .question-box{
-      min-height:240px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:18px;
-      background:linear-gradient(135deg,#ffffff,#eff6ff);
+      min-height:240px;display:flex;flex-direction:column;justify-content:center;gap:18px;
+      background:linear-gradient(135deg,#ffffff,#eff6ff)
     }
-
-    .question{
-      font-size:38px;
-      font-weight:900;
-      line-height:1.25;
-      text-align:center;
-    }
-
-    .question-small{
-      color:var(--muted);
-      text-align:center;
-      font-size:15px;
-    }
-
-    .answers{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-      margin-top:4px;
-    }
-
+    .question{font-size:38px;font-weight:900;line-height:1.25;text-align:center}
+    .question-small{color:var(--muted);text-align:center;font-size:15px}
+    .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px}
     .answer-btn{
-      width:100%;
-      text-align:center;
-      padding:15px;
-      border-radius:16px;
-      border:2px solid #dbeafe;
-      background:#fff;
-      font-size:18px;
-      font-weight:800;
-      cursor:pointer;
+      width:100%;text-align:center;padding:15px;border-radius:16px;border:2px solid #dbeafe;background:#fff;
+      font-size:18px;font-weight:800;cursor:pointer
     }
-
     .answer-btn:hover{border-color:#93c5fd}
+    .quiz-side .mini{background:#f8fbff;border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:12px}
+    .big-center{text-align:center;padding:24px;border:2px dashed #c7d8fb;border-radius:20px;background:#f8fbff}
 
-    .quiz-side .mini{
-      background:#f8fbff;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:12px 14px;
-      margin-bottom:12px;
+    .leaderboard-list,.teacher-table{width:100%;border-collapse:collapse}
+    .leaderboard-list td,.teacher-table td,.teacher-table th{
+      padding:12px 10px;border-bottom:1px solid #e5edf8;text-align:left;font-size:14px
     }
-
-    .big-center{
-      text-align:center;
-      padding:24px;
-      border:2px dashed #c7d8fb;
-      border-radius:20px;
-      background:#f8fbff;
-    }
-
-    .leaderboard-list,
-    .teacher-table{
-      width:100%;
-      border-collapse:collapse;
-    }
-
-    .leaderboard-list td,
-    .teacher-table td,
-    .teacher-table th{
-      padding:12px 10px;
-      border-bottom:1px solid #e5edf8;
-      text-align:left;
-      font-size:14px;
-    }
-
-    .teacher-table th{
-      color:#4b5563;
-      background:#f8fbff;
-      font-size:13px;
-    }
-
-    .rank{
-      width:40px;
-      font-weight:900;
-      color:var(--blue);
-    }
+    .teacher-table th{color:#4b5563;background:#f8fbff;font-size:13px}
+    .rank{width:40px;font-weight:900;color:var(--blue)}
 
     .hidden{display:none !important}
     .success{color:#047857;font-weight:800}
@@ -430,45 +129,14 @@
     .status{font-size:13px;color:var(--muted);margin-top:8px}
     .footer-note{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
 
-    .coins-box{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .inventory-grid,
-    .shop-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-      gap:14px;
-    }
-
-    .shop-item{
-      border:2px solid #dbeafe;
-      border-radius:20px;
-      padding:16px;
-      background:#fff;
-    }
-
-    .shop-item.owned{
-      border-color:#bbf7d0;
-      background:#f0fdf4;
-    }
-
+    .coins-box{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .shop-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px}
+    .shop-item{border:2px solid #dbeafe;border-radius:20px;padding:16px;background:#fff}
+    .shop-item.owned{border-color:#bbf7d0;background:#f0fdf4}
     .item-preview{
-      height:84px;
-      border-radius:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin-bottom:12px;
-      font-size:28px;
-      font-weight:900;
-      border:2px dashed #dbeafe;
-      background:#f8fbff;
+      height:84px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;
+      font-size:28px;font-weight:900;border:2px dashed #dbeafe;background:#f8fbff
     }
-
     .item-preview.bg-sky{background:linear-gradient(180deg,#dbeafe,#eff6ff)}
     .item-preview.bg-jungle{background:linear-gradient(180deg,#dcfce7,#bbf7d0)}
     .item-preview.bg-galaxy{background:linear-gradient(180deg,#1e1b4b,#4c1d95); color:#fff}
@@ -478,192 +146,108 @@
     .item-preview.avatar-blue{background:#dbeafe}
     .item-preview.avatar-robot{background:#e5e7eb}
     .item-preview.avatar-ninja{background:#ede9fe}
+    .owned-badge{
+      display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;margin-left:6px
+    }
+
+    .profile-strip{
+      display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:#f8fbff;
+      border:1px solid var(--line);margin-top:12px
+    }
+    .profile-avatar{
+      width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;
+      background:#fff;border:3px solid #dbeafe;flex-shrink:0
+    }
+    .profile-avatar.frame-bronze{box-shadow:0 0 0 5px #cd7f32 inset}
+    .profile-avatar.frame-rainbow{box-shadow:0 0 0 5px #8b5cf6 inset}
+    .profile-avatar.frame-champion{box-shadow:0 0 0 5px #f59e0b inset}
+    .profile-avatar.avatar-blue{background:#dbeafe}
+    .profile-avatar.avatar-ninja{background:#ede9fe}
+    .profile-avatar.avatar-robot{background:#e5e7eb}
+
+    .bg-sky-theme{background:linear-gradient(180deg,#dbeafe,#eff6ff)}
+    .bg-jungle-theme{background:linear-gradient(180deg,#dcfce7,#f0fdf4)}
+    .bg-galaxy-theme{background:linear-gradient(180deg,#1e1b4b,#312e81); color:#fff}
+    .bg-galaxy-theme .muted,
+    .bg-galaxy-theme .small,
+    .bg-galaxy-theme label,
+    .bg-galaxy-theme .section-title p{color:#dbeafe}
 
     /* Visual quiz widgets */
     .visual-board{
-      background:#fff;
-      border:2px solid #e6eefb;
-      border-radius:24px;
-      padding:24px;
-      min-height:250px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      gap:18px;
+      background:#fff;border:2px solid #e6eefb;border-radius:24px;padding:24px;min-height:250px;
+      display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px
     }
-
-    .array-wrap{
-      display:grid;
-      gap:14px;
-      justify-content:center;
-      align-items:center;
-    }
-
-    .array-row{
-      display:flex;
-      gap:14px;
-      justify-content:center;
-    }
-
+    .array-wrap{display:grid;gap:14px;justify-content:center;align-items:center}
+    .array-row{display:flex;gap:14px;justify-content:center}
     .array-dot{
-      width:34px;
-      height:34px;
-      border-radius:50%;
-      background:#6366f1;
-      transform:scale(0.2);
-      opacity:0;
-      animation:popIn .35s ease forwards;
+      width:34px;height:34px;border-radius:50%;background:#6366f1;transform:scale(0.2);opacity:0;animation:popIn .35s ease forwards
     }
+    @keyframes popIn{to{transform:scale(1);opacity:1}}
+    .array-caption{color:var(--muted);font-weight:700}
 
-    @keyframes popIn{
-      to{
-        transform:scale(1);
-        opacity:1;
-      }
-    }
-
-    .array-caption{
-      color:var(--muted);
-      font-weight:700;
-    }
-
-    .numberline-wrap{
-      width:100%;
-      max-width:720px;
-      padding:20px 10px 10px;
-    }
-
-    .numberline-svg{
-      width:100%;
-      height:auto;
-      display:block;
-    }
-
+    .numberline-wrap{width:100%;max-width:720px;padding:20px 10px 10px}
+    .numberline-svg{width:100%;height:auto;display:block}
     .jump-path{
-      fill:none;
-      stroke:#fb7185;
-      stroke-width:4;
-      stroke-linecap:round;
-      stroke-dasharray:160;
-      stroke-dashoffset:160;
-      animation:drawJump .7s ease forwards;
+      fill:none;stroke:#fb7185;stroke-width:4;stroke-linecap:round;stroke-dasharray:160;stroke-dashoffset:160;
+      animation:drawJump .7s ease forwards
     }
+    @keyframes drawJump{to{stroke-dashoffset:0}}
+    .line-base{stroke:#6366f1;stroke-width:5;stroke-linecap:round}
+    .tick{stroke:#6366f1;stroke-width:3}
+    .tick-label{font-size:14px;fill:#334155;font-weight:700}
 
-    @keyframes drawJump{
-      to{ stroke-dashoffset:0; }
-    }
-
-    .line-base{
-      stroke:#6366f1;
-      stroke-width:5;
-      stroke-linecap:round;
-    }
-
-    .tick{
-      stroke:#6366f1;
-      stroke-width:3;
-    }
-
-    .tick-label{
-      font-size:14px;
-      fill:#334155;
-      font-weight:700;
-    }
-
-    .dragdrop-wrap{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:20px;
-    }
-
-    .drag-equation{
-      font-size:38px;
-      font-weight:900;
-      text-align:center;
-    }
-
+    .dragdrop-wrap{display:flex;flex-direction:column;align-items:center;gap:20px}
+    .drag-equation{font-size:38px;font-weight:900;text-align:center}
     .drop-zone{
-      min-width:140px;
-      min-height:72px;
-      border:3px dashed #bfd4ff;
-      border-radius:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:24px;
-      font-weight:800;
-      color:#94a3b8;
-      background:#f8fbff;
+      min-width:140px;min-height:72px;border:3px dashed #bfd4ff;border-radius:18px;display:flex;align-items:center;
+      justify-content:center;font-size:24px;font-weight:800;color:#94a3b8;background:#f8fbff
     }
-
-    .drop-zone.over{
-      border-color:#6366f1;
-      background:#eef2ff;
-    }
-
-    .drag-options{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:14px;
-    }
-
+    .drop-zone.over{border-color:#6366f1;background:#eef2ff}
+    .drag-options{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
     .drag-chip{
-      padding:16px 22px;
-      border:3px dashed #6366f1;
-      border-radius:16px;
-      background:#fff;
-      font-size:28px;
-      font-weight:800;
-      color:#1e293b;
-      cursor:grab;
-      user-select:none;
+      padding:16px 22px;border:3px dashed #6366f1;border-radius:16px;background:#fff;font-size:28px;font-weight:800;
+      color:#1e293b;cursor:grab;user-select:none
     }
-
-    .drag-chip:active{
-      cursor:grabbing;
-    }
-
-    .drag-chip.used{
-      opacity:.35;
-      pointer-events:none;
-    }
-
+    .drag-chip:active{cursor:grabbing}
+    .drag-chip.used{opacity:.35;pointer-events:none}
     .visual-answer-row{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      align-items:center;
-      flex-wrap:wrap;
-      width:100%;
+      display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;width:100%
+    }
+    .visual-answer-row input{max-width:260px;margin:0}
+
+    .streak-box{
+      background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:16px;padding:10px 12px;font-weight:700
     }
 
-    .visual-answer-row input{
-      max-width:260px;
-      margin:0;
+    .celebration-overlay{
+      position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;
+      z-index:9999;padding:20px
+    }
+    .celebration-overlay.show{display:flex}
+    .celebration-card{
+      width:min(560px, 100%);background:#fff;border-radius:28px;padding:28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.25);
+      position:relative;overflow:hidden
+    }
+    .celebration-card h2{margin:0 0 10px;font-size:34px}
+    .celebration-card p{margin:6px 0;color:var(--muted)}
+    .celebration-icons{font-size:34px;margin-bottom:10px}
+    .confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .confetti{
+      position:absolute;width:10px;height:18px;opacity:.9;animation:fall 2.2s linear forwards;border-radius:3px
+    }
+    @keyframes fall{
+      from{transform:translateY(-30px) rotate(0deg)}
+      to{transform:translateY(420px) rotate(540deg);opacity:0}
     }
 
     @media (max-width: 900px){
-      .grid-hero,.quiz-wrap{
-        grid-template-columns:1fr;
-      }
-      .stats{
-        grid-template-columns:repeat(2,1fr);
-      }
-      .answers{
-        grid-template-columns:1fr;
-      }
-      .question{
-        font-size:30px;
-      }
-      .drag-equation{
-        font-size:28px;
-      }
-      .drag-chip{
-        font-size:22px;
-      }
+      .grid-hero,.quiz-wrap{grid-template-columns:1fr}
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .answers{grid-template-columns:1fr}
+      .question{font-size:30px}
+      .drag-equation{font-size:28px}
+      .drag-chip{font-size:22px}
     }
   </style>
 </head>
@@ -685,7 +269,7 @@
       </div>
     </div>
 
-    <div class="grid grid-hero">
+    <div id="heroCard" class="grid grid-hero">
       <div class="hero-box">
         <h2>Master multiplication step by step</h2>
         <p>
@@ -698,6 +282,17 @@
           <div class="stat"><div class="n">⭐</div><div>Stars</div></div>
           <div class="stat"><div class="n">🪙</div><div>Coins</div></div>
         </div>
+
+        <div id="profileStrip" class="profile-strip hidden">
+          <div id="profileAvatar" class="profile-avatar">🙂</div>
+          <div>
+            <div id="profileName" style="font-size:20px;font-weight:900;">Student</div>
+            <div id="profileTitle" class="muted">No title equipped</div>
+            <div id="profileMeta" class="small">⭐ 0 • 🪙 0</div>
+          </div>
+        </div>
+
+        <div id="streakBox" class="streak-box hidden" style="margin-top:12px;"></div>
       </div>
 
       <div class="card">
@@ -840,6 +435,16 @@
     </div>
   </div>
 
+  <div id="celebrationOverlay" class="celebration-overlay">
+    <div class="celebration-card">
+      <div class="confetti-wrap" id="confettiWrap"></div>
+      <div class="celebration-icons">🎉 🏆 🪙</div>
+      <h2 id="celebrationTitle">Table Unlocked!</h2>
+      <p id="celebrationText">Amazing work.</p>
+      <button class="btn btn-primary" onclick="closeCelebration()">Awesome!</button>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
     import {
@@ -880,15 +485,15 @@
     const TABLES = [2,3,4,5,6,7,8,9,10,11,12];
 
     const SHOP_ITEMS = [
-      { id: "avatar_blue", type: "avatar", name: "Blue Hero", price: 20, preview: "🙂", previewClass: "avatar-blue" },
-      { id: "avatar_ninja", type: "avatar", name: "Math Ninja", price: 50, preview: "🥷", previewClass: "avatar-ninja" },
-      { id: "avatar_robot", type: "avatar", name: "Robot Kid", price: 80, preview: "🤖", previewClass: "avatar-robot" },
+      { id: "avatar_blue", type: "avatar", name: "Blue Hero", price: 20, preview: "🙂", previewClass: "avatar-blue", avatarEmoji: "🙂" },
+      { id: "avatar_ninja", type: "avatar", name: "Math Ninja", price: 50, preview: "🥷", previewClass: "avatar-ninja", avatarEmoji: "🥷" },
+      { id: "avatar_robot", type: "avatar", name: "Robot Kid", price: 80, preview: "🤖", previewClass: "avatar-robot", avatarEmoji: "🤖" },
       { id: "frame_bronze", type: "frame", name: "Bronze Ring", price: 20, preview: "🖼️", previewClass: "frame-bronze" },
       { id: "frame_rainbow", type: "frame", name: "Rainbow Glow", price: 60, preview: "🌈", previewClass: "frame-rainbow" },
       { id: "frame_champion", type: "frame", name: "Champion Edge", price: 100, preview: "🏆", previewClass: "frame-champion" },
-      { id: "bg_sky", type: "background", name: "Sky Blue", price: 30, preview: "☁️", previewClass: "bg-sky" },
-      { id: "bg_jungle", type: "background", name: "Jungle Math", price: 70, preview: "🌿", previewClass: "bg-jungle" },
-      { id: "bg_galaxy", type: "background", name: "Galaxy Quest", price: 120, preview: "🌌", previewClass: "bg-galaxy" },
+      { id: "bg_sky", type: "background", name: "Sky Blue", price: 30, preview: "☁️", previewClass: "bg-sky", themeClass: "bg-sky-theme" },
+      { id: "bg_jungle", type: "background", name: "Jungle Math", price: 70, preview: "🌿", previewClass: "bg-jungle", themeClass: "bg-jungle-theme" },
+      { id: "bg_galaxy", type: "background", name: "Galaxy Quest", price: 120, preview: "🌌", previewClass: "bg-galaxy", themeClass: "bg-galaxy-theme" },
       { id: "title_explorer", type: "title", name: "Table Explorer", price: 25, preview: "Explorer", previewClass: "" },
       { id: "title_ninja", type: "title", name: "Number Ninja", price: 60, preview: "Ninja", previewClass: "" },
       { id: "title_master", type: "title", name: "Multiplication Master", price: 120, preview: "Master", previewClass: "" }
@@ -908,6 +513,11 @@
 
     function makeStudentId(name, studentClass){
       return `${name.trim().toLowerCase().replace(/\s+/g, "-")}__${studentClass.trim().toLowerCase().replace(/\s+/g, "-")}`;
+    }
+
+    function todayKey(){
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
     }
 
     function defaultInventory(){
@@ -937,6 +547,9 @@
         completedMethods: completed,
         lastPlayedTable: 2,
         inventory: defaultInventory(),
+        streak: 0,
+        lastActiveDate: null,
+        streakBonusClaimedDate: null,
         updatedAt: null,
         createdAt: null
       };
@@ -945,9 +558,7 @@
     function normalizeStudent(student){
       if (!student.completedMethods) student.completedMethods = {};
       TABLES.forEach(t => {
-        if (!Array.isArray(student.completedMethods[t])) {
-          student.completedMethods[t] = [];
-        }
+        if (!Array.isArray(student.completedMethods[t])) student.completedMethods[t] = [];
       });
       if (typeof student.coins !== "number") student.coins = 0;
       if (!student.inventory) student.inventory = defaultInventory();
@@ -956,6 +567,9 @@
       ["avatar","frame","background","title"].forEach(k => {
         if (!(k in student.inventory.equipped)) student.inventory.equipped[k] = null;
       });
+      if (typeof student.streak !== "number") student.streak = 0;
+      if (!("lastActiveDate" in student)) student.lastActiveDate = null;
+      if (!("streakBonusClaimedDate" in student)) student.streakBonusClaimedDate = null;
       return student;
     }
 
@@ -978,6 +592,105 @@
       await setDoc(doc(db, "students", student.id), payload, { merge: true });
     }
 
+    function getItem(itemId){
+      return SHOP_ITEMS.find(i => i.id === itemId) || null;
+    }
+
+    function equippedItem(type){
+      return state.currentStudent?.inventory?.equipped?.[type] || null;
+    }
+
+    function isOwned(itemId){
+      return !!state.currentStudent?.inventory?.owned?.includes(itemId);
+    }
+
+    function applyEquippedTheme(){
+      const heroCard = document.getElementById("heroCard");
+      heroCard.classList.remove("bg-sky-theme", "bg-jungle-theme", "bg-galaxy-theme");
+      if (!state.currentStudent) return;
+      const bg = getItem(equippedItem("background"));
+      if (bg?.themeClass) heroCard.classList.add(bg.themeClass);
+    }
+
+    function renderStreak(){
+      const box = document.getElementById("streakBox");
+      if (!state.currentStudent){
+        box.classList.add("hidden");
+        return;
+      }
+      const streak = state.currentStudent.streak || 0;
+      const bonus = Math.min(3 + ((Math.max(1, streak) - 1) * 2), 7);
+      box.innerHTML = `🔥 Daily streak: <b>${streak}</b> day${streak === 1 ? "" : "s"} • Next method today gives <b>+${bonus} bonus coins</b>`;
+      box.classList.remove("hidden");
+    }
+
+    function renderCurrentStudentBox(){
+      const el = document.getElementById("currentStudentBox");
+      const shopCoins = document.getElementById("shopCoinsBox");
+      const profileStrip = document.getElementById("profileStrip");
+
+      if (!state.currentStudent){
+        el.textContent = "No student yet";
+        shopCoins.textContent = "🪙 0 coins";
+        profileStrip.classList.add("hidden");
+        applyEquippedTheme();
+        renderStreak();
+        return;
+      }
+
+      const title = getItem(equippedItem("title"))?.name || "";
+      el.textContent = `${state.currentStudent.name}${title ? " • " + title : ""} • ${state.currentStudent.studentClass} • ⭐ ${state.currentStudent.stars} • 🪙 ${state.currentStudent.coins}`;
+      shopCoins.textContent = `🪙 ${state.currentStudent.coins} coins`;
+
+      const avatarItem = getItem(equippedItem("avatar"));
+      const frameItem = getItem(equippedItem("frame"));
+
+      document.getElementById("profileName").textContent = state.currentStudent.name;
+      document.getElementById("profileTitle").textContent = title || "No title equipped";
+      document.getElementById("profileMeta").textContent = `${state.currentStudent.studentClass} • ⭐ ${state.currentStudent.stars} • 🪙 ${state.currentStudent.coins}`;
+
+      const avatarEl = document.getElementById("profileAvatar");
+      avatarEl.className = "profile-avatar";
+      if (avatarItem?.previewClass) avatarEl.classList.add(avatarItem.previewClass);
+      if (frameItem?.previewClass) avatarEl.classList.add(frameItem.previewClass);
+      avatarEl.textContent = avatarItem?.avatarEmoji || "🙂";
+      profileStrip.classList.remove("hidden");
+
+      applyEquippedTheme();
+      renderStreak();
+    }
+
+    function maybeApplyDailyStreakLogin(student){
+      const today = todayKey();
+      if (!student.lastActiveDate){
+        student.streak = 1;
+        student.lastActiveDate = today;
+        return;
+      }
+      const last = new Date(student.lastActiveDate + "T00:00:00");
+      const now = new Date(today + "T00:00:00");
+      const diffDays = Math.round((now - last) / (1000*60*60*24));
+      if (diffDays === 0){
+        return;
+      } else if (diffDays === 1){
+        student.streak += 1;
+      } else {
+        student.streak = 1;
+      }
+      student.lastActiveDate = today;
+      student.streakBonusClaimedDate = null;
+    }
+
+    function claimDailyStreakBonusIfNeeded(student){
+      const today = todayKey();
+      if (student.streakBonusClaimedDate === today) return 0;
+      const streak = Math.max(1, student.streak || 1);
+      const bonus = Math.min(3 + ((streak - 1) * 2), 7);
+      student.coins += bonus;
+      student.streakBonusClaimedDate = today;
+      return bonus;
+    }
+
     window.loginStudent = async function(){
       const name = document.getElementById("studentName").value.trim();
       const studentClass = document.getElementById("studentClass").value.trim();
@@ -995,13 +708,21 @@
         state.currentStudent = normalizeStudent(snap.data());
       } else {
         state.currentStudent = defaultStudent(name, studentClass);
-        await saveStudentRecord(state.currentStudent);
       }
 
+      maybeApplyDailyStreakLogin(state.currentStudent);
       state.currentStudentId = studentId;
 
+      const streakBonus = claimDailyStreakBonusIfNeeded(state.currentStudent);
+
+      if (!snap.exists()){
+        await saveStudentRecord(state.currentStudent);
+      } else {
+        await saveCurrentStudent();
+      }
+
       document.getElementById("studentSummary").innerHTML =
-        `<span class="success">Logged in:</span> ${state.currentStudent.name} (${state.currentStudent.studentClass})`;
+        `<span class="success">Logged in:</span> ${state.currentStudent.name} (${state.currentStudent.studentClass})${streakBonus ? ` • Daily streak bonus +${streakBonus} coins` : ""}`;
 
       renderCurrentStudentBox();
       renderTables();
@@ -1011,23 +732,9 @@
       showSection("tablesSection");
     };
 
-    function renderCurrentStudentBox(){
-      const el = document.getElementById("currentStudentBox");
-      if (!state.currentStudent){
-        el.textContent = "No student yet";
-        document.getElementById("shopCoinsBox").textContent = "🪙 0 coins";
-        return;
-      }
-      const titleId = state.currentStudent.inventory?.equipped?.title;
-      const title = SHOP_ITEMS.find(i => i.id === titleId)?.name;
-      el.textContent = `${state.currentStudent.name}${title ? " • " + title : ""} • ${state.currentStudent.studentClass} • ⭐ ${state.currentStudent.stars} • 🪙 ${state.currentStudent.coins}`;
-      document.getElementById("shopCoinsBox").textContent = `🪙 ${state.currentStudent.coins} coins`;
-    }
-
     window.showSection = function(id){
       const methods = document.getElementById("methodsSection");
       const quiz = document.getElementById("quizSection");
-
       if (id === "tablesSection"){
         methods.classList.add("hidden");
         quiz.classList.add("hidden");
@@ -1057,9 +764,7 @@
             </button>
           </div>
         `;
-        if (unlocked){
-          card.addEventListener("click", () => openTable(table));
-        }
+        if (unlocked) card.addEventListener("click", () => openTable(table));
         grid.appendChild(card);
       });
     }
@@ -1069,12 +774,10 @@
         alert("Please log in first.");
         return;
       }
-
       if (table > state.currentStudent.highestUnlockedTable){
         alert("This table is still locked.");
         return;
       }
-
       state.selectedTable = table;
       state.currentStudent.lastPlayedTable = table;
       document.getElementById("methodsTitle").textContent = `Training Methods • Table ${table}`;
@@ -1088,7 +791,6 @@
     function renderMethods(){
       const grid = document.getElementById("methodsGrid");
       grid.innerHTML = "";
-
       METHODS.forEach((method, index) => {
         const done = state.currentStudent.completedMethods[state.selectedTable].includes(method.key);
         const card = document.createElement("div");
@@ -1120,7 +822,6 @@
 
     function startMethod(methodKey){
       if (!state.currentStudent || !state.selectedTable) return;
-
       state.selectedMethod = methodKey;
       state.quizQuestions = generateQuestions(state.selectedTable, methodKey, 10);
       state.quizIndex = 0;
@@ -1179,42 +880,35 @@
 
       if (q.type === "arrayVisual"){
         area.innerHTML = buildArrayVisual(q);
-        area.insertAdjacentHTML(
-          "beforeend",
-          `
+        area.insertAdjacentHTML("beforeend", `
           <div class="visual-answer-row">
             <input id="typedAnswer" type="number" placeholder="How many in total?" />
             <button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button>
           </div>
-          `
-        );
+        `);
         return;
       }
 
       if (q.type === "numberLineVisual"){
         area.innerHTML = buildNumberLineVisual(q);
-        area.insertAdjacentHTML(
-          "beforeend",
-          `
+        area.insertAdjacentHTML("beforeend", `
           <div class="visual-answer-row">
             <input id="typedAnswer" type="number" placeholder="Where do you land?" />
             <button class="btn btn-primary" onclick="submitTypedAnswer()">Check ✓</button>
           </div>
-          `
-        );
+        `);
         return;
       }
 
       if (q.type === "dragDropReal"){
         area.innerHTML = buildDragDropVisual(q);
-        setupRealDragDrop(q);
+        setupRealDragDrop();
       }
     }
 
     function buildArrayVisual(q){
       let rowsHtml = "";
       let delay = 0;
-
       for (let r = 0; r < q.rows; r++){
         let dots = "";
         for (let c = 0; c < q.cols; c++){
@@ -1223,29 +917,15 @@
         }
         rowsHtml += `<div class="array-row">${dots}</div>`;
       }
-
-      return `
-        <div class="visual-board">
-          <div class="array-wrap">
-            ${rowsHtml}
-          </div>
-          <div class="array-caption">${q.rows} rows × ${q.cols} columns</div>
-        </div>
-      `;
+      return `<div class="visual-board"><div class="array-wrap">${rowsHtml}</div><div class="array-caption">${q.rows} rows × ${q.cols} columns</div></div>`;
     }
 
     function buildNumberLineVisual(q){
       const end = q.answer;
       const step = q.step;
       const jumps = q.jumps;
-
-      const width = 620;
-      const startX = 40;
-      const endX = 580;
-      const y = 90;
-      const usable = endX - startX;
+      const width = 620, startX = 40, endX = 580, y = 90, usable = endX - startX;
       const points = [];
-
       for (let i = 0; i <= jumps; i++){
         const value = i * step;
         const x = startX + (usable * value / end);
@@ -1254,62 +934,39 @@
 
       let ticks = "";
       points.forEach(p => {
-        ticks += `
-          <line class="tick" x1="${p.x}" y1="${y-8}" x2="${p.x}" y2="${y+12}"></line>
-          <text class="tick-label" x="${p.x}" y="${y+34}" text-anchor="middle">${p.value}</text>
-        `;
+        ticks += `<line class="tick" x1="${p.x}" y1="${y-8}" x2="${p.x}" y2="${y+12}"></line>
+                  <text class="tick-label" x="${p.x}" y="${y+34}" text-anchor="middle">${p.value}</text>`;
       });
 
       let jumpPaths = "";
       for (let i = 0; i < points.length - 1; i++){
-        const p1 = points[i];
-        const p2 = points[i + 1];
-        const midX = (p1.x + p2.x) / 2;
-        const lift = 42;
-        jumpPaths += `
-          <path
-            class="jump-path"
-            style="animation-delay:${i * 0.25}s"
-            d="M ${p1.x} ${y} Q ${midX} ${y - lift} ${p2.x} ${y}"
-          ></path>
-        `;
+        const p1 = points[i], p2 = points[i + 1];
+        const midX = (p1.x + p2.x) / 2, lift = 42;
+        jumpPaths += `<path class="jump-path" style="animation-delay:${i * 0.25}s"
+                      d="M ${p1.x} ${y} Q ${midX} ${y - lift} ${p2.x} ${y}"></path>`;
       }
 
-      return `
-        <div class="visual-board">
-          <div class="numberline-wrap">
-            <svg class="numberline-svg" viewBox="0 0 ${width} 150" xmlns="http://www.w3.org/2000/svg">
-              <line class="line-base" x1="${startX}" y1="${y}" x2="${endX}" y2="${y}"></line>
-              ${ticks}
-              ${jumpPaths}
-            </svg>
-          </div>
-        </div>
-      `;
+      return `<div class="visual-board"><div class="numberline-wrap">
+                <svg class="numberline-svg" viewBox="0 0 ${width} 150" xmlns="http://www.w3.org/2000/svg">
+                  <line class="line-base" x1="${startX}" y1="${y}" x2="${endX}" y2="${y}"></line>
+                  ${ticks}${jumpPaths}
+                </svg>
+              </div></div>`;
     }
 
     function buildDragDropVisual(q){
-      return `
-        <div class="visual-board">
-          <div class="dragdrop-wrap">
-            <div class="drag-equation">${q.left} × ${q.right} = <span id="dropAnswerText">?</span></div>
-            <div id="dropZone" class="drop-zone">Drop here</div>
-            <div class="drag-options">
-              ${q.options.map((opt, i) => `
-                <div class="drag-chip" draggable="true" data-value="${opt}" id="dragChip${i}">
-                  ${opt}
-                </div>
-              `).join("")}
-            </div>
-            <button class="btn btn-primary" onclick="submitDroppedAnswer()">Check ✓</button>
-          </div>
+      return `<div class="visual-board"><div class="dragdrop-wrap">
+        <div class="drag-equation">${q.left} × ${q.right} = <span id="dropAnswerText">?</span></div>
+        <div id="dropZone" class="drop-zone">Drop here</div>
+        <div class="drag-options">
+          ${q.options.map((opt, i) => `<div class="drag-chip" draggable="true" data-value="${opt}" id="dragChip${i}">${opt}</div>`).join("")}
         </div>
-      `;
+        <button class="btn btn-primary" onclick="submitDroppedAnswer()">Check ✓</button>
+      </div></div>`;
     }
 
     function setupRealDragDrop(){
       window.currentDroppedValue = null;
-
       const dropZone = document.getElementById("dropZone");
       const answerText = document.getElementById("dropAnswerText");
       const chips = document.querySelectorAll(".drag-chip");
@@ -1326,22 +983,17 @@
         dropZone.classList.add("over");
       });
 
-      dropZone.addEventListener("dragleave", () => {
-        dropZone.classList.remove("over");
-      });
+      dropZone.addEventListener("dragleave", () => dropZone.classList.remove("over"));
 
       dropZone.addEventListener("drop", e => {
         e.preventDefault();
         dropZone.classList.remove("over");
-
         const value = e.dataTransfer.getData("text/plain");
         const chipId = e.dataTransfer.getData("chip-id");
-
         window.currentDroppedValue = value;
         answerText.textContent = value;
         dropZone.textContent = "";
         dropZone.appendChild(answerText);
-
         chips.forEach(c => c.classList.remove("used"));
         const usedChip = document.getElementById(chipId);
         if (usedChip) usedChip.classList.add("used");
@@ -1366,7 +1018,6 @@
       window.currentDroppedValue = null;
       const q = state.quizQuestions[state.quizIndex];
       const correct = String(answer).trim() === String(q.correct).trim();
-
       state.currentStudent.totalAnswered += 1;
 
       if (correct){
@@ -1392,19 +1043,50 @@
       }, 650);
     }
 
+    function createConfetti(){
+      const wrap = document.getElementById("confettiWrap");
+      wrap.innerHTML = "";
+      const colors = ["#60a5fa","#fbbf24","#34d399","#fb7185","#a78bfa"];
+      for (let i = 0; i < 42; i++){
+        const el = document.createElement("div");
+        el.className = "confetti";
+        el.style.left = `${Math.random() * 100}%`;
+        el.style.background = colors[i % colors.length];
+        el.style.animationDelay = `${Math.random() * .6}s`;
+        el.style.transform = `translateY(-30px) rotate(${Math.random()*180}deg)`;
+        wrap.appendChild(el);
+      }
+    }
+
+    function showCelebration(title, text){
+      document.getElementById("celebrationTitle").textContent = title;
+      document.getElementById("celebrationText").textContent = text;
+      createConfetti();
+      document.getElementById("celebrationOverlay").classList.add("show");
+    }
+
+    window.closeCelebration = function(){
+      document.getElementById("celebrationOverlay").classList.remove("show");
+    };
+
     async function finishQuiz(){
       const perfect = state.quizScore === state.quizQuestions.length;
+      const methodsDone = state.currentStudent.completedMethods[state.selectedTable];
+      const firstTimeMethodCompletion = !methodsDone.includes(state.selectedMethod);
+
       if (perfect){
         state.quizStars += 5;
         state.quizCoins += 5;
       }
 
       state.currentStudent.stars += state.quizStars;
-      state.currentStudent.coins += state.quizCoins + 5; // method completion bonus
+      state.currentStudent.coins += state.quizCoins;
 
-      const methodsDone = state.currentStudent.completedMethods[state.selectedTable];
-      if (!methodsDone.includes(state.selectedMethod)){
+      let streakBonus = 0;
+      if (firstTimeMethodCompletion){
         methodsDone.push(state.selectedMethod);
+        state.currentStudent.coins += 5;
+        streakBonus = claimDailyStreakBonusIfNeeded(state.currentStudent);
       }
 
       let unlockedNewTable = false;
@@ -1412,7 +1094,7 @@
         if (state.currentStudent.highestUnlockedTable < state.selectedTable + 1){
           state.currentStudent.highestUnlockedTable = state.selectedTable + 1;
           state.currentStudent.stars += 10;
-          state.currentStudent.coins += 25; // table complete + unlock bonus
+          state.currentStudent.coins += 25;
           unlockedNewTable = true;
         }
       }
@@ -1422,6 +1104,8 @@
       renderShop();
 
       const methodName = METHODS.find(m => m.key === state.selectedMethod).name;
+      const displayCoins = state.quizCoins + (firstTimeMethodCompletion ? 5 : 0) + streakBonus;
+
       document.getElementById("questionMeta").textContent = "Quiz Finished";
       document.getElementById("questionText").innerHTML = `
         Great job, ${state.currentStudent.name}!<br><br>
@@ -1429,11 +1113,19 @@
           ${methodName} complete<br>
           Score: ${state.quizScore}/10<br>
           Stars earned: ⭐ ${state.quizStars}<br>
-          Coins earned: 🪙 ${state.quizCoins + 5}
+          Coins earned: 🪙 ${displayCoins}
         </div>
       `;
 
       let extra = "";
+      if (firstTimeMethodCompletion){
+        extra += `<div class="success" style="margin-top:10px;font-size:18px;">First-time method bonus: +5 coins</div>`;
+      } else {
+        extra += `<div class="small" style="margin-top:10px;font-size:15px;">Repeat play: no extra method bonus, so farming easy tables is limited.</div>`;
+      }
+      if (streakBonus){
+        extra += `<div class="success" style="margin-top:8px;font-size:17px;">Daily streak bonus: +${streakBonus} coins</div>`;
+      }
       if (state.currentStudent.completedMethods[state.selectedTable].length === 10){
         extra += `<div class="success" style="margin-top:10px;font-size:18px;">Table ${state.selectedTable} mastered!</div>`;
         if (state.selectedTable < 12 && unlockedNewTable){
@@ -1452,53 +1144,38 @@
 
       document.getElementById("quizScore").textContent = state.quizScore;
       document.getElementById("quizStars").textContent = state.quizStars;
-      document.getElementById("quizCoins").textContent = state.quizCoins + 5;
+      document.getElementById("quizCoins").textContent = displayCoins;
       document.getElementById("quizFeedback").textContent = perfect ? "Perfect score bonus earned!" : "Method completed";
 
       renderTables();
       await loadLeaderboard();
       await loadTeacherDashboard();
+
+      if (unlockedNewTable){
+        showCelebration(
+          `Table ${state.selectedTable + 1} Unlocked!`,
+          `${state.currentStudent.name} mastered Table ${state.selectedTable}. Big reward: +25 coins and a new table opened.`
+        );
+      }
     }
 
     function generateQuestions(table, methodKey, count){
       const qs = [];
-
       for (let i = 0; i < count; i++){
         const multiplier = rand(1, 12);
         const answer = table * multiplier;
 
         if (methodKey === "repeatedAddition"){
           const repeated = Array(multiplier).fill(table).join(" + ");
-          qs.push({
-            prompt: `${repeated} = ?`,
-            correct: answer,
-            type: "input",
-            meta: `Repeated Addition • ×${table}`
-          });
+          qs.push({ prompt: `${repeated} = ?`, correct: answer, type: "input", meta: `Repeated Addition • ×${table}` });
         }
 
         if (methodKey === "arrayMethod"){
-          qs.push({
-            prompt: `Show ${multiplier} rows of ${table}. How many total?`,
-            correct: answer,
-            answer,
-            rows: multiplier,
-            cols: table,
-            type: "arrayVisual",
-            meta: `🔵 Array Method • ×${table}`
-          });
+          qs.push({ prompt: `Show ${multiplier} rows of ${table}. How many total?`, correct: answer, answer, rows: multiplier, cols: table, type: "arrayVisual", meta: `🔵 Array Method • ×${table}` });
         }
 
         if (methodKey === "numberLine"){
-          qs.push({
-            prompt: `Jump ${multiplier} times in groups of ${table} on the number line. Where do you land?`,
-            correct: answer,
-            answer,
-            step: table,
-            jumps: multiplier,
-            type: "numberLineVisual",
-            meta: `📏 Number Line • ×${table}`
-          });
+          qs.push({ prompt: `Jump ${multiplier} times in groups of ${table} on the number line. Where do you land?`, correct: answer, answer, step: table, jumps: multiplier, type: "numberLineVisual", meta: `📏 Number Line • ×${table}` });
         }
 
         if (methodKey === "doublingStrategy"){
@@ -1506,7 +1183,6 @@
           const questionText = table % 2 === 0
             ? `If ${half} × ${multiplier} = ${half * multiplier}, what is ${table} × ${multiplier}?`
             : `${table} × ${multiplier} = ?`;
-
           qs.push({
             prompt: questionText,
             correct: answer,
@@ -1538,21 +1214,11 @@
         }
 
         if (methodKey === "fillBlank"){
-          qs.push({
-            prompt: `${table} × ${multiplier} = __`,
-            correct: answer,
-            type: "input",
-            meta: `Fill in the Blank • ×${table}`
-          });
+          qs.push({ prompt: `${table} × ${multiplier} = __`, correct: answer, type: "input", meta: `Fill in the Blank • ×${table}` });
         }
 
         if (methodKey === "missingEquation"){
-          qs.push({
-            prompt: `${table} × __ = ${answer}`,
-            correct: multiplier,
-            type: "input",
-            meta: `Missing Equation • ×${table}`
-          });
+          qs.push({ prompt: `${table} × __ = ${answer}`, correct: multiplier, type: "input", meta: `Missing Equation • ×${table}` });
         }
 
         if (methodKey === "dragDrop"){
@@ -1561,12 +1227,7 @@
             correct: answer,
             left: table,
             right: multiplier,
-            options: shuffle([
-              answer,
-              answer + 10,
-              Math.max(1, answer - 5),
-              answer - 1 > 0 ? answer - 1 : answer + 3
-            ]),
+            options: shuffle([answer, answer + 10, Math.max(1, answer - 5), answer - 1 > 0 ? answer - 1 : answer + 3]),
             type: "dragDropReal",
             meta: `🎯 Drag & Drop • ×${table}`
           });
@@ -1584,16 +1245,7 @@
           });
         }
       }
-
       return qs;
-    }
-
-    function isOwned(itemId){
-      return !!state.currentStudent?.inventory?.owned?.includes(itemId);
-    }
-
-    function equippedItem(type){
-      return state.currentStudent?.inventory?.equipped?.[type] || null;
     }
 
     window.buyItem = async function(itemId){
@@ -1601,7 +1253,7 @@
         alert("Please log in first.");
         return;
       }
-      const item = SHOP_ITEMS.find(i => i.id === itemId);
+      const item = getItem(itemId);
       if (!item) return;
 
       if (isOwned(itemId)){
@@ -1637,10 +1289,10 @@
       }
 
       const inv = state.currentStudent.inventory;
-      const titleName = SHOP_ITEMS.find(i => i.id === inv.equipped.title)?.name || "None";
-      const avatarName = SHOP_ITEMS.find(i => i.id === inv.equipped.avatar)?.name || "None";
-      const frameName = SHOP_ITEMS.find(i => i.id === inv.equipped.frame)?.name || "None";
-      const bgName = SHOP_ITEMS.find(i => i.id === inv.equipped.background)?.name || "None";
+      const titleName = getItem(inv.equipped.title)?.name || "None";
+      const avatarName = getItem(inv.equipped.avatar)?.name || "None";
+      const frameName = getItem(inv.equipped.frame)?.name || "None";
+      const bgName = getItem(inv.equipped.background)?.name || "None";
 
       summary.innerHTML = `
         Owned items: <b>${inv.owned.length}</b> •
@@ -1656,7 +1308,10 @@
         return `
           <div class="shop-item ${owned ? "owned" : ""}">
             <div class="item-preview ${item.previewClass || ""}">${item.preview}</div>
-            <div style="font-size:18px;font-weight:800;">${item.name}</div>
+            <div style="font-size:18px;font-weight:800;">
+              ${item.name}
+              ${owned ? '<span class="owned-badge">Owned</span>' : ''}
+            </div>
             <div class="muted" style="margin:6px 0 10px;">${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</div>
             <div class="pill" style="margin-bottom:12px;">🪙 ${item.price}</div>
             <div>
@@ -1667,6 +1322,12 @@
           </div>
         `;
       }).join("");
+    }
+
+    function renderNameWithOwnership(s){
+      const avatar = getItem(s.inventory?.equipped?.avatar)?.avatarEmoji || "🙂";
+      const title = getItem(s.inventory?.equipped?.title)?.name || "";
+      return `${avatar} ${s.name || "-"}${title ? `<div class="small">${title}</div>` : ""}`;
     }
 
     window.loadLeaderboard = async function(){
@@ -1703,7 +1364,7 @@
           return `
             <tr>
               <td class="rank">${i+1}</td>
-              <td>${s.name || "-"}</td>
+              <td>${renderNameWithOwnership(s)}</td>
               <td>${s.studentClass || "-"}</td>
               <td>⭐ ${s.stars || 0}</td>
               <td>🪙 ${s.coins || 0}</td>
@@ -1755,13 +1416,11 @@
           </tr>
           ${students.map(s => {
             let done = 0;
-            TABLES.forEach(t => {
-              done += Array.isArray(s.completedMethods?.[t]) ? s.completedMethods[t].length : 0;
-            });
+            TABLES.forEach(t => { done += Array.isArray(s.completedMethods?.[t]) ? s.completedMethods[t].length : 0; });
             const acc = s.totalAnswered ? Math.round((s.totalCorrect / s.totalAnswered) * 100) : 0;
             return `
               <tr>
-                <td>${s.name || "-"}</td>
+                <td>${renderNameWithOwnership(s)}</td>
                 <td>${s.studentClass || "-"}</td>
                 <td>×${s.highestUnlockedTable || 2}</td>
                 <td>${done}/110</td>
@@ -1786,6 +1445,7 @@
       return [...arr].sort(() => Math.random() - 0.5);
     }
 
+    renderCurrentStudentBox();
     renderTables();
     renderShop();
     loadLeaderboard();
