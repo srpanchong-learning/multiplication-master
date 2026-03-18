@@ -135,6 +135,12 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
 .boss-bar{flex:1;height:16px;background:#fed7aa;border-radius:999px;overflow:hidden}
 .boss-bar span{display:block;height:100%;background:linear-gradient(90deg,#f97316,#ef4444)}
 .chest-box{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f5f3ff;border:1px solid #c4b5fd;border-radius:18px;padding:14px}
+
+.medal-strip{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px}
+.medal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:8px;margin-top:10px}
+.medal-card{background:#f8fbff;border:1px solid var(--line);border-radius:14px;padding:8px;text-align:center}
+.medal-icon{font-size:22px}
+
 .overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
 .overlay.show{display:flex}
 .modal{width:min(560px,100%);background:#fff;border-radius:28px;padding:28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.25);position:relative;overflow:hidden}
@@ -164,7 +170,7 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
       <div class="logo">×</div>
       <div>
         <h1>Multiplication Master Worlds</h1>
-        <p>Learning map • daily challenge • bosses • treasure chests • teacher analytics</p>
+        <p>Learning map • medals • daily challenge • bosses • treasure chests • teacher analytics</p>
       </div>
     </div>
     <div class="nav">
@@ -199,6 +205,11 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
 
       <div id="streakBox" class="pill hidden" style="margin-top:14px;"></div>
       <div id="challengeBox" class="pill hidden" style="margin-top:10px;background:#dbeafe;color:#1d4ed8;"></div>
+      <div id="medalSection" class="medal-strip hidden">
+        <div style="font-weight:900;">🏅 Medal Cabinet</div>
+        <div class="small">Gold = perfect, Silver = excellent, Bronze = good</div>
+        <div id="medalGrid" class="medal-grid"></div>
+      </div>
     </div>
 
     <div class="card">
@@ -444,13 +455,21 @@ function worldMultiplier(table){
 function completionBonus(table){
   return ({2:20,3:25,4:35,5:50,6:60,7:80,8:100,9:120,10:150,11:180,12:250})[table] || 20;
 }
+function medalForScore(score, total=10){
+  const pct = (score/total) * 100;
+  if (pct === 100) return {level:"gold", icon:"🥇", label:"Gold"};
+  if (pct >= 90) return {level:"silver", icon:"🥈", label:"Silver"};
+  if (pct >= 75) return {level:"bronze", icon:"🥉", label:"Bronze"};
+  return {level:"none", icon:"⬜", label:"None"};
+}
 function defaultStudent(name, studentClass){
-  const completedMethods = {}, accuracies = {}, bosses = {}, chests = {};
+  const completedMethods = {}, accuracies = {}, bosses = {}, chests = {}, medals = {};
   WORLDS.forEach(w => {
     completedMethods[w.table] = [];
     accuracies[w.table] = {correct:0, total:0};
     bosses[w.table] = false;
     chests[w.table] = false;
+    medals[w.table] = "none";
   });
   return {
     id: studentId(name, studentClass),
@@ -458,7 +477,7 @@ function defaultStudent(name, studentClass){
     stars:0, coins:0, streak:0,
     lastActiveDate:null, streakBonusClaimedDate:null,
     highestUnlockedTable:2,
-    completedMethods, accuracies, bosses, chests,
+    completedMethods, accuracies, bosses, chests, medals,
     inventory:{owned:[], equipped:{avatar:null,frame:null,background:null,title:null,sticker:null}},
     dailyChallenge:{date:todayKey(), target:10, progress:0, reward:15, claimed:false},
     updatedAt:null, createdAt:null
@@ -469,11 +488,13 @@ function normalizeStudent(s){
   if (!s.accuracies) s.accuracies = {};
   if (!s.bosses) s.bosses = {};
   if (!s.chests) s.chests = {};
+  if (!s.medals) s.medals = {};
   WORLDS.forEach(w => {
     if (!Array.isArray(s.completedMethods[w.table])) s.completedMethods[w.table] = [];
     if (!s.accuracies[w.table]) s.accuracies[w.table] = {correct:0,total:0};
     if (typeof s.bosses[w.table] !== "boolean") s.bosses[w.table] = false;
     if (typeof s.chests[w.table] !== "boolean") s.chests[w.table] = false;
+    if (!s.medals[w.table]) s.medals[w.table] = "none";
   });
   if (typeof s.coins !== "number") s.coins = 0;
   if (typeof s.stars !== "number") s.stars = 0;
@@ -556,9 +577,11 @@ function renderProfile(){
   const challengeBox = document.getElementById("challengeBox");
   const currentBox = document.getElementById("currentStudentBox");
   const shopCoins = document.getElementById("shopCoins");
+  const medalSection = document.getElementById("medalSection");
+  const medalGrid = document.getElementById("medalGrid");
 
   if (!s){
-    box.classList.add("hidden"); streakBox.classList.add("hidden"); challengeBox.classList.add("hidden");
+    box.classList.add("hidden"); streakBox.classList.add("hidden"); challengeBox.classList.add("hidden"); medalSection.classList.add("hidden");
     currentBox.textContent = "No student yet";
     shopCoins.textContent = "🪙 0 coins";
     document.getElementById("heroCard").classList.remove("bg-sky-theme","bg-jungle-theme","bg-galaxy-theme");
@@ -594,6 +617,13 @@ function renderProfile(){
   challengeBox.classList.remove("hidden");
   currentBox.textContent = `${s.name} • ⭐ ${s.stars} • 🪙 ${s.coins} • x${s.highestUnlockedTable}`;
   shopCoins.textContent = `🪙 ${s.coins} coins`;
+
+  medalGrid.innerHTML = WORLDS.map(w => {
+    const medal = s.medals[w.table] || "none";
+    const icon = medal === "gold" ? "🥇" : medal === "silver" ? "🥈" : medal === "bronze" ? "🥉" : "⬜";
+    return `<div class="medal-card"><div class="medal-icon">${icon}</div><div class="small">×${w.table}</div></div>`;
+  }).join("");
+  medalSection.classList.remove("hidden");
 }
 
 window.showSection = function(id){
@@ -613,6 +643,8 @@ function renderWorldMap(){
     const bossDone = state.currentStudent ? state.currentStudent.bosses[w.table] : false;
     const allDone = doneCount === 10;
     const chestDone = state.currentStudent ? state.currentStudent.chests[w.table] : false;
+    const medal = state.currentStudent ? state.currentStudent.medals[w.table] : "none";
+    const medalIcon = medal === "gold" ? "🥇" : medal === "silver" ? "🥈" : medal === "bronze" ? "🥉" : "⬜";
 
     const card = document.createElement("div");
     card.className = "world-card" + (unlocked ? "" : " locked") + (allDone ? " done" : "");
@@ -625,6 +657,7 @@ function renderWorldMap(){
       <div class="progress"><span style="width:${doneCount*10}%"></span></div>
       <div class="small">${bossDone ? "Boss defeated" : allDone ? "Boss ready" : "Boss locked"}</div>
       <div class="small">${chestDone ? "Chest opened" : bossDone ? "Chest ready" : "Chest locked"}</div>
+      <div class="small" style="margin-top:6px;">Medal: ${medalIcon}</div>
     `;
     if (unlocked) card.onclick = () => openWorld(w.table);
     map.appendChild(card);
@@ -818,7 +851,10 @@ async function finishQuiz(){
     if (state.quizScore >= 7){
       state.currentStudent.bosses[state.selectedTable] = true;
       state.currentStudent.coins += Math.round(15 * worldMultiplier(state.selectedTable));
+      const medalAward = medalForScore(state.quizScore, 10);
+      state.currentStudent.medals[state.selectedTable] = medalAward.level;
       extra += `<div class="success" style="margin-top:8px;">Boss defeated! Boss reward added.</div>`;
+      extra += `<div class="success" style="margin-top:8px;">Medal earned: ${medalAward.icon} ${medalAward.label}</div>`;
       if (state.selectedTable < 12 && state.currentStudent.highestUnlockedTable < state.selectedTable + 1){
         state.currentStudent.highestUnlockedTable = state.selectedTable + 1;
         state.currentStudent.coins += completionBonus(state.selectedTable);
@@ -1058,6 +1094,8 @@ function renderPlayerCard(s, rank, highlight=false){
   const titleItem = getItem(s.inventory?.equipped?.title);
   const stickerItem = getItem(s.inventory?.equipped?.sticker);
   const avatarEmoji = avatarItem?.avatarEmoji || "🙂";
+  const medalCount = Object.values(s.medals || {}).filter(v => v && v !== "none").length;
+  const medalIcons = WORLDS.map(w => { const m = s.medals?.[w.table] || "none"; return m === "gold" ? "🥇" : m === "silver" ? "🥈" : m === "bronze" ? "🥉" : ""; }).filter(Boolean).slice(0,4).join("");
   return `
     <div class="lb-row" style="${highlight ? 'background:#eff6ff;border-radius:16px;' : ''}">
       <div class="lb-left">
@@ -1066,6 +1104,7 @@ function renderPlayerCard(s, rank, highlight=false){
         <div>
           <div class="highlight-name">${s.name}</div>
           <div class="small">${titleItem?.name || 'No title'} ${stickerItem ? '• ' + stickerItem.preview + ' ' + stickerItem.name : ''}</div>
+          <div class="small">${medalIcons || '⬜'} ${medalCount ? '• ' + medalCount + ' medals' : ''}</div>
         </div>
       </div>
       <div style="text-align:right">
