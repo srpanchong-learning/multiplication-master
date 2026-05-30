@@ -365,7 +365,7 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
       <button class="btn btn-primary" onclick="showPinOverlay()">Enter PIN</button>
     </div>
     <div id="teacherContent" class="hidden">
-      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:12px;align-items:end;margin-bottom:14px;">
         <div>
           <label for="filterClass">Filter by Class</label>
           <select id="filterClass" onchange="loadTeacherDashboard()">
@@ -377,6 +377,16 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
         <div>
           <label for="teacherSearch">Search Student</label>
           <input id="teacherSearch" type="text" placeholder="Type name..." oninput="loadTeacherDashboard()" />
+        </div>
+        <div>
+          <label for="weeklyTarget">Weekly Target (days)</label>
+          <select id="weeklyTarget" onchange="loadTeacherDashboard()">
+            <option value="1">1 day</option>
+            <option value="2" selected>2 days</option>
+            <option value="3">3 days</option>
+            <option value="4">4 days</option>
+            <option value="5">5 days</option>
+          </select>
         </div>
         <button class="btn btn-secondary" onclick="lockTeacher()">🔒 Lock</button>
       </div>
@@ -719,6 +729,7 @@ function defaultStudent(name, studentClass){
     name, studentClass,
     stars:0, coins:0, streak:0,
     lastActiveDate:null, streakBonusClaimedDate:null,
+    practiceDates:[], totalSessions:0,
     highestUnlockedTable:2,
     completedMethods, accuracies, bosses, chests, medals,
     inventory:{owned:[], equipped:{avatar:null,frame:null,background:null,title:null,sticker:null}},
@@ -742,6 +753,8 @@ function normalizeStudent(s){
   if (typeof s.coins !== "number") s.coins = 0;
   if (typeof s.stars !== "number") s.stars = 0;
   if (typeof s.streak !== "number") s.streak = 0;
+  if (!Array.isArray(s.practiceDates)) s.practiceDates = [];
+  if (typeof s.totalSessions !== "number") s.totalSessions = 0;
   if (!s.inventory) s.inventory = {owned:[], equipped:{avatar:null,frame:null,background:null,title:null,sticker:null}};
   if (!Array.isArray(s.inventory.owned)) s.inventory.owned = [];
   if (!s.inventory.equipped) s.inventory.equipped = {avatar:null,frame:null,background:null,title:null,sticker:null};
@@ -773,6 +786,9 @@ function equipped(type){ return state.currentStudent?.inventory?.equipped?.[type
 
 function maybeUpdateStreak(student){
   const today = todayKey();
+  // Record this day as a practice day (distinct days only)
+  if (!Array.isArray(student.practiceDates)) student.practiceDates = [];
+  if (!student.practiceDates.includes(today)) student.practiceDates.push(today);
   if (!student.lastActiveDate){
     student.streak = 1;
     student.lastActiveDate = today;
@@ -794,6 +810,17 @@ function claimStreakBonus(student){
   student.coins += bonus;
   student.streakBonusClaimedDate = today;
   return bonus;
+}
+
+function daysPracticedInLast(student, n){
+  if (!Array.isArray(student.practiceDates)) return 0;
+  const cutoff = new Date();
+  cutoff.setHours(0,0,0,0);
+  cutoff.setDate(cutoff.getDate() - (n - 1));
+  return student.practiceDates.filter(d => {
+    const dt = new Date(d + "T00:00:00");
+    return dt >= cutoff;
+  }).length;
 }
 
 window.loginStudent = async function(){
@@ -1135,6 +1162,7 @@ async function finishQuiz(){
   let extra = "";
   let unlockNext = false;
 
+  state.currentStudent.totalSessions = (state.currentStudent.totalSessions || 0) + 1;
   state.currentStudent.stars += state.quizStars;
   state.currentStudent.coins += state.quizCoins;
 
@@ -1495,6 +1523,26 @@ window.loadLeaderboard = async function(){
   }
 };
 
+window.exportFrequencyCSV = function(){
+  const data = window.__freqExportData || [];
+  if (!data.length){ alert("No practice data to export yet."); return; }
+  const target = window.__weeklyTarget || 2;
+  const headers = ["Pupil","Year","Total Days Practised","Days This Week",`Met Target (${target}+ days)`,"Total Sessions","Current Streak","Last Played","All Practice Dates"];
+  const rows = data.map(d => [
+    `"${d.name}"`, d.year, d.totalDays, d.thisWeek, d.targetMet, d.sessions, d.streak, d.lastPlayed, `"${d.allDates}"`
+  ].join(","));
+  const csv = headers.join(",") + "\n" + rows.join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `home_practice_frequency_${todayKey()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 window.loadTeacherDashboard = async function(){
   const teacherLb = document.getElementById("teacherLeaderboard");
   const heatmap = document.getElementById("heatmap");
@@ -1561,6 +1609,72 @@ window.loadTeacherDashboard = async function(){
       });
       sipTable += `</table></div>`;
       teacherLb.innerHTML += sipTable;
+    }
+
+    // ── Home Practice Frequency table ──
+    if (students.length){
+      const weeklyTarget = parseInt(document.getElementById("weeklyTarget")?.value || "2", 10);
+      const freqStudents = [...students].sort((a,b) =>
+        (b.practiceDates?.length||0) - (a.practiceDates?.length||0));
+
+      let metCount = 0, belowCount = 0;
+      freqStudents.forEach(s => {
+        (daysPracticedInLast(s, 7) >= weeklyTarget) ? metCount++ : belowCount++;
+      });
+
+      let freq = `<div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span style="font-weight:900;">📅 Home Practice Frequency</span>
+        <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="exportFrequencyCSV()">⬇ Export CSV</button>
+      </div>`;
+      freq += `<div style="display:flex;gap:10px;margin:8px 0;flex-wrap:wrap;">
+        <span class="pill" style="background:#dcfce7;color:#166534;">✓ Met target (${weeklyTarget}+ days): ${metCount}</span>
+        <span class="pill" style="background:#fee2e2;color:#991b1b;">⚠ Below target: ${belowCount}</span>
+      </div>`;
+      freq += `<div class="heatmap-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:580px;margin-top:8px;">`;
+      freq += `<tr style="text-align:left;color:#6b7280;font-size:11px;">
+        <th style="padding:6px;">Pupil</th>
+        <th style="padding:6px;text-align:center;">Year</th>
+        <th style="padding:6px;text-align:center;">Total Days</th>
+        <th style="padding:6px;text-align:center;">This Week</th>
+        <th style="padding:6px;text-align:center;">Target Met?</th>
+        <th style="padding:6px;text-align:center;">Sessions</th>
+        <th style="padding:6px;text-align:center;">Current Streak</th>
+        <th style="padding:6px;text-align:center;">Last Played</th></tr>`;
+      freqStudents.forEach(s => {
+        const totalDays = s.practiceDates?.length || 0;
+        const thisWeek = daysPracticedInLast(s, 7);
+        const met = thisWeek >= weeklyTarget;
+        const weekCol = met ? "#10b981" : thisWeek >= 1 ? "#f59e0b" : "#ef4444";
+        const metCell = met
+          ? `<span style="color:#10b981;font-weight:700;">✓ Yes</span>`
+          : `<span style="color:#ef4444;font-weight:700;">✗ No</span>`;
+        freq += `<tr style="border-top:0.5px solid #eef2f7;${met ? "" : "background:#fff7f7;"}">
+          <td style="padding:6px;">${s.name}</td>
+          <td style="padding:6px;text-align:center;">${(s.studentClass||"").replace("Year ","")}</td>
+          <td style="padding:6px;text-align:center;font-weight:700;">${totalDays}</td>
+          <td style="padding:6px;text-align:center;font-weight:700;color:${weekCol};">${thisWeek}</td>
+          <td style="padding:6px;text-align:center;">${metCell}</td>
+          <td style="padding:6px;text-align:center;">${s.totalSessions||0}</td>
+          <td style="padding:6px;text-align:center;">🔥 ${s.streak||0}</td>
+          <td style="padding:6px;text-align:center;color:#6b7280;">${s.lastActiveDate||"—"}</td></tr>`;
+      });
+      freq += `</table></div>`;
+      freq += `<div class="small" style="color:#6b7280;margin-top:6px;">Target = ${weeklyTarget} day(s) of practice per week (change it using the Weekly Target control above). Rows highlighted pink are below target. Total Days = distinct days practised overall.</div>`;
+      teacherLb.innerHTML += freq;
+
+      // Stash data for CSV export
+      window.__freqExportData = freqStudents.map(s => ({
+        name: s.name,
+        year: (s.studentClass||"").replace("Year ",""),
+        totalDays: s.practiceDates?.length || 0,
+        thisWeek: daysPracticedInLast(s, 7),
+        targetMet: daysPracticedInLast(s, 7) >= weeklyTarget ? "Yes" : "No",
+        sessions: s.totalSessions || 0,
+        streak: s.streak || 0,
+        lastPlayed: s.lastActiveDate || "",
+        allDates: (s.practiceDates||[]).join(" | ")
+      }));
+      window.__weeklyTarget = weeklyTarget;
     }
 
     let header = `<div class="heatmap-grid">`;
