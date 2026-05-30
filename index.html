@@ -126,6 +126,20 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
 .highlight-name{font-weight:900}
 .around-me{background:#f8fbff;border:1px solid var(--line);border-radius:18px;padding:12px}
 .heatmap-grid{display:grid;grid-template-columns:160px repeat(11, 1fr);gap:6px;font-size:12px;align-items:center}
+.heatmap-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+.pin-overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);display:none;align-items:center;justify-content:center;z-index:19999;padding:20px}
+.pin-overlay.show{display:flex}
+.pin-box{background:#fff;border-radius:28px;padding:32px 28px;width:min(360px,100%);text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.pin-box h3{margin:0 0 8px;font-size:26px}
+.pin-box p{margin:0 0 18px;color:var(--muted);font-size:14px}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:18px}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:2px solid #bfd4ff;background:#fff;transition:background .15s}
+.pin-dot.filled{background:var(--blue);border-color:var(--blue)}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 14px}
+.pin-key{padding:16px;border-radius:16px;border:2px solid #dbe7fb;background:#fff;font-size:22px;font-weight:800;cursor:pointer;color:var(--text)}
+.pin-key:hover{background:#eff6ff;border-color:#93c5fd}
+.pin-key.del{background:#fef2f2;border-color:#fecaca;color:var(--red)}
+.pin-error{color:var(--red);font-size:13px;font-weight:700;min-height:20px}
 .heatcell{padding:8px 6px;border-radius:10px;text-align:center;font-weight:800}
 .green{background:#dcfce7;color:#166534}
 .yellow{background:#fef3c7;color:#92400e}
@@ -159,7 +173,10 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
   .answers{grid-template-columns:1fr}
   .question{font-size:28px}
   .drag-equation{font-size:28px}
-  .heatmap-grid{grid-template-columns:120px repeat(11, 1fr);font-size:10px}
+  .heatmap-grid{grid-template-columns:90px repeat(11, minmax(36px,1fr));font-size:10px}
+  .heatcell{padding:5px 2px;font-size:10px}
+  .brand h1{font-size:20px}
+  .nav .btn{padding:9px 10px;font-size:12px}
 }
 </style>
 </head>
@@ -205,6 +222,7 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
 
       <div id="streakBox" class="pill hidden" style="margin-top:14px;"></div>
       <div id="challengeBox" class="pill hidden" style="margin-top:10px;background:#dbeafe;color:#1d4ed8;"></div>
+      <div id="sipScorePanel" class="card hidden" style="margin-top:12px;padding:14px;"></div>
       <div id="medalSection" class="medal-strip hidden">
         <div style="font-weight:900;">🏅 Medal Cabinet</div>
         <div class="small">Gold = perfect, Silver = excellent, Bronze = good</div>
@@ -216,17 +234,23 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
       <div class="section-title">
         <div>
           <h3>Student Login</h3>
-          <p>Use the same name and class to continue progress on any device.</p>
+          <p>Select your year and name to begin.</p>
         </div>
       </div>
-      <label for="studentName">Student Name</label>
-      <input id="studentName" type="text" placeholder="e.g. Aisyah" />
-      <label for="studentClass">Class</label>
-      <select id="studentClass">
-        <option value="">Select Class</option>
+      <label for="studentClass">Year Level</label>
+      <select id="studentClass" onchange="populateNameDropdown()">
+        <option value="">— Select Year —</option>
         <option>Year 1</option><option>Year 2</option><option>Year 3</option>
         <option>Year 4</option><option>Year 5</option><option>Year 6</option>
       </select>
+      <label for="studentNameSelect">Student Name</label>
+      <select id="studentNameSelect" disabled>
+        <option value="">— Select Year first —</option>
+      </select>
+      <div id="notInListBox" style="display:none;margin-bottom:12px;">
+        <label for="studentName">Type your name</label>
+        <input id="studentName" type="text" placeholder="Enter full name" />
+      </div>
       <button class="btn btn-primary" style="width:100%" onclick="loginStudent()">Start Learning</button>
       <div id="loginStatus" class="small" style="margin-top:10px;"></div>
     </div>
@@ -334,30 +358,67 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
       </div>
       <button class="btn btn-secondary" onclick="loadTeacherDashboard()">Refresh</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
-      <div>
-        <label for="filterClass">Filter by Class</label>
-        <select id="filterClass" onchange="loadTeacherDashboard()">
-          <option value="All">All Classes</option>
-          <option>Year 1</option><option>Year 2</option><option>Year 3</option>
-          <option>Year 4</option><option>Year 5</option><option>Year 6</option>
-        </select>
-      </div>
-      <div>
-        <label for="teacherSearch">Search Student</label>
-        <input id="teacherSearch" type="text" placeholder="Type name..." oninput="loadTeacherDashboard()" />
-      </div>
-      <button class="btn btn-secondary" onclick="loadTeacherDashboard()">Refresh</button>
+    <div id="teacherLocked" style="text-align:center;padding:40px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">🔒</div>
+      <div style="font-size:20px;font-weight:900;margin-bottom:8px;">Teacher Access Only</div>
+      <p style="color:var(--muted);margin-bottom:18px;">Enter the teacher PIN to view the dashboard.</p>
+      <button class="btn btn-primary" onclick="showPinOverlay()">Enter PIN</button>
     </div>
-    <div id="teacherLeaderboard"></div>
-    <div style="margin-top:18px;">
-      <div style="font-weight:900;margin-bottom:10px;">Learning Heatmap</div>
-      <div id="heatmap"></div>
+    <div id="teacherContent" class="hidden">
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
+        <div>
+          <label for="filterClass">Filter by Class</label>
+          <select id="filterClass" onchange="loadTeacherDashboard()">
+            <option value="All">All Classes</option>
+            <option>Year 1</option><option>Year 2</option><option>Year 3</option>
+            <option>Year 4</option><option>Year 5</option><option>Year 6</option>
+          </select>
+        </div>
+        <div>
+          <label for="teacherSearch">Search Student</label>
+          <input id="teacherSearch" type="text" placeholder="Type name..." oninput="loadTeacherDashboard()" />
+        </div>
+        <button class="btn btn-secondary" onclick="lockTeacher()">🔒 Lock</button>
+      </div>
+      <div id="teacherLeaderboard"></div>
+      <div style="margin-top:18px;">
+        <div style="font-weight:900;margin-bottom:10px;">Learning Heatmap <span class="small">(scroll sideways on mobile)</span></div>
+        <div class="heatmap-scroll"><div id="heatmap"></div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="overlay" class="overlay">
+<div id="pinOverlay" class="pin-overlay">
+  <div class="pin-box">
+    <div style="font-size:40px;margin-bottom:8px;">🔐</div>
+    <h3>Teacher PIN</h3>
+    <p>Enter the 4-digit PIN to access the Teacher Dashboard.</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key del" onclick="pinPress('del')" style="grid-column:1">⌫</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" onclick="pinPress('cancel')" style="background:#f3f4f6;font-size:14px;">✕</button>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+  </div>
+</div>
+
+
   <div class="modal">
     <div id="confettiWrap" class="confetti-wrap"></div>
     <div id="modalIcon" style="font-size:34px;margin-bottom:10px;">🎉</div>
@@ -366,6 +427,138 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
     <button class="btn btn-primary" onclick="closeModal()">Awesome!</button>
   </div>
 </div>
+
+<script>
+// ── Pupil data + dropdown (regular script, runs immediately, no dependencies) ──
+window.PUPIL_LISTS = {
+  "Year 1": [
+    "ADRIELL RAYMOND BIN SAPEIE",
+    "KONG XIAN LI",
+    "MOHAMMAD HAZIRUL ABBASY BIN ABDULLAH",
+    "MOHAMMAD KHAIRUL ZAQWAN BIN MOHAMMAD IBRAHEM",
+    "MOHAMMAD NOR EDIE DARWISH BIN MOHAMMAD NORIKHWAN",
+    "MUHAMMAD AFIQ ZAYYAN BIN MUHAMMAD SAIFUL SYAZWAN",
+    "MUHAMMAD EDDIE EDZWAN BIN MUHAMMAD EDDIE SUFIYAN",
+    "MUHAMMAD FIRAS NUFAEL BIN AZIZOL FAIZAN",
+    "MUHAMMAD NABIL FIKRI BIN MUHAMMAD NOH RIZAL",
+    "MUHAMMAD SHAHIRUL IMAN FAIQ BIN SUHAINI",
+    "NUR ALESHA ZAHRA BINTI MUHAMMAD FAIZUREN",
+    "ROMESSA BINTI MERIO"
+  ],
+  "Year 2": [
+    "ARFAN ANAK ASMADDEY*",
+    "MOHAMMAD FARIS ADAM BIN AZIZOL FAIZAN*",
+    "MOHAMMAD NOR ADIE AZUWAN BIN MOHAMMAD NORIKHWAN*",
+    "MUHAMMAD EDDIE IZYAN BIN MUHAMMAD EDDIE SUFIYAN*",
+    "NUR ASYAFIA BINTI MUHAMMAD SAIFUL SYAZWAN*",
+    "NURUL FARESYA AURORA BINTI MOHAMMAD FAUZILAH*"
+  ],
+  "Year 3": [
+    "ALVIN CALIN BIN NOORASLISHAH*",
+    "ARIESYA AZ-ZAHRA BINTI MUSLIM*",
+    "MOHD SHAFIRUL MALIK BIN MOHD HILMI*",
+    "MUHAMMAD KHAIR AS-SOLEH BIN ABDULLAH*",
+    "NUR ARISHA BINTI MUHAMMAD FITRI ZUL HILMI*",
+    "NUR FALISHA DANIA BINTI MUHAMMAD FAIZUREN*",
+    "NURUL RIZAWANIZAH BINTI MUHAMMAD MALIK REDUAN*",
+    "NURUL SYAHIRAH BINTI MUHAMMAD EDDIE SUFIYAN*"
+  ],
+  "Year 4": [
+    "Aryan Anak Asmaddey*",
+    "Muhammad Afiq Ahnaf Bin Muhammad Saiful Syazwan*",
+    "Muhammad Aniq Izzuddin Bin Mohammad Sharul Azmi*",
+    "Muhammad Danish Al-Shafie Bin Norshahadani*",
+    "Muhammad Nur'raiyyan Ehsan Al-Ghazali Bin Abdullah*",
+    "Noreaddyratul Rafyikah Binti Remeoeaddy*",
+    "Nur Alisha Az-Zahara Binti Abdul Hadi*",
+    "Nur Amirah Qarirah Binti Abdullah*",
+    "Nurhaziqah Binti Hj Abdul Aziz*",
+    "Nurul Miasarah Binti Yan Sumardie*",
+    "Shareena Shaqirah Binti Sah Mohamad Pazan*"
+  ],
+  "Year 5": [
+    "AISYAH AZ-ZAHRA BINTI MUSLIM*",
+    "ARYAN ARDY BIN SAPERY*",
+    "MOHAMMAD NORANDIKA FARDY BIN HAJI MOHAMMAD NORDARWANDY*",
+    "NURUL RIZAWANINA BINTI MUHAMMAD MALIK REDUAN*",
+    "ROSHAMIZZAH BINTI ROSLAN*",
+    "SHAN ERINEO BIN SHANDRIN*",
+    "SITI NUR HAISYAH BINTI MOHAMMAD SHARUL AZMI*"
+  ],
+  "Year 6": [
+    "ALYSHA ANAK ASMADDEY",
+    "AZIRUL BIN HAJI ABDUL AZIZ",
+    "DANG ARYANA ARIESSA BINTI SAPERY",
+    "MOHAMMAD KHAIRUL AMINUDDIN BIN MOHAMMAD IBRAHEM",
+    "MUHAMMAD EDDY RIDZRUL BIN MUHAMMAD ERUWAN",
+    "MUHAMMAD KHAIRUL WAFIQ BIN EDURUL",
+    "MUHAMMAD NIRZA ERWAN SHAH BIN MUHAMMAD MALIK REDUAN",
+    "MUHAMMAD NUR SAFWAN HAZIQ BIN SA AHRILL",
+    "NORAZRIEZAH BINTI PUKUL",
+    "NORASHURANI BINTI NORAZMI"
+  ]
+};
+
+window.SIP_SCORES = {
+  "arfan-anak-asmaddey__year-2":{ preTest:0, pt1:84 },
+  "muhammad-eddie-izyan-bin-muhammad-eddie-sufiyan__year-2":{ preTest:23, pt1:88 },
+  "mohammad-faris-adam-bin-azizol-faizan__year-2":{ preTest:87, pt1:100 },
+  "mohammad-nor-adie-azuwan-bin-mohammad-norikhwan__year-2":{ preTest:0, pt1:4 },
+  "nur-asyafia-binti-muhammad-saiful-syazwan__year-2":{ preTest:0, pt1:100 },
+  "nurul-faresya-aurora-binti-mohammad-fauzilah__year-2":{ preTest:30, pt1:96 },
+  "alvin-calin-bin-nooraslishah__year-3":{ preTest:100, pt1:100 },
+  "mohd-shafirul-malik-bin-mohd-hilmi__year-3":{ preTest:97, pt1:null },
+  "muhammad-khair-as-soleh-bin-abdullah__year-3":{ preTest:3, pt1:8 },
+  "ariesya-az-zahra-binti-muslim__year-3":{ preTest:100, pt1:100 },
+  "nur-arisha-binti-muhammad-fitri-zul-hilmi__year-3":{ preTest:100, pt1:100 },
+  "nur-falisha-dania-binti-muhammad-faizuren__year-3":{ preTest:90, pt1:100 },
+  "nurul-rizawanizah-binti-muhammad-malik-reduan__year-3":{ preTest:97, pt1:100 },
+  "nurul-syahirah-binti-muhammad-eddie-sufiyan__year-3":{ preTest:100, pt1:100 },
+  "aryan-anak-asmaddey__year-4":{ preTest:50, pt1:100 },
+  "muhammad-afiq-ahnaf-bin-muhammad-saiful-syazwan__year-4":{ preTest:37, pt1:80 },
+  "muhammad-aniq-izzuddin-bin-mohammad-sharul-azmi__year-4":{ preTest:65, pt1:72 },
+  "muhammad-danish-al-shafie-bin-norshahadani__year-4":{ preTest:55, pt1:96 },
+  "nur-alisha-az-zahara-binti-abdul-hadi__year-4":{ preTest:48, pt1:92 },
+  "nurul-miasarah-binti-yan-sumardie__year-4":{ preTest:45, pt1:84 },
+  "nur-amirah-qarirah-binti-abdullah__year-4":{ preTest:0, pt1:48 },
+  "noreaddyratul-rafyikah-binti-remeoeaddy__year-4":{ preTest:65, pt1:100 },
+  "shareena-shaqirah-binti-sah-mohamad-pazan__year-4":{ preTest:0, pt1:28 },
+  "muhammad-nur'raiyyan-ehsan-al-ghazali-bin-abdullah__year-4":{ preTest:15, pt1:48 },
+  "nurhaziqah-binti-hj-abdul-aziz__year-4":{ preTest:33, pt1:84 },
+  "aryan-ardy-bin-sapery__year-5":{ preTest:15, pt1:64 },
+  "mohammad-norandika-fardy-bin-haji-mohammad-nordarwandy__year-5":{ preTest:88, pt1:96 },
+  "shan-erineo-bin-shandrin__year-5":{ preTest:18, pt1:56 },
+  "aisyah-az-zahra-binti-muslim__year-5":{ preTest:93, pt1:92 },
+  "nurul-rizawanina-binti-muhammad-malik-reduan__year-5":{ preTest:78, pt1:92 },
+  "roshamizzah-binti-roslan__year-5":{ preTest:73, pt1:96 },
+  "siti-nur-haisyah-binti-mohammad-sharul-azmi__year-5":{ preTest:93, pt1:100 }
+};
+
+window.populateNameDropdown = function(){
+  const yr = document.getElementById("studentClass").value;
+  const sel = document.getElementById("studentNameSelect");
+  const notInList = document.getElementById("notInListBox");
+  sel.innerHTML = '<option value="">— Select name —</option>';
+  if (!yr){ sel.disabled = true; return; }
+  sel.disabled = false;
+  (window.PUPIL_LISTS[yr] || []).forEach(p => {
+    const isSip = p.endsWith("*");
+    const name = p.replace("*","");
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name + (isSip ? " ★" : "");
+    sel.appendChild(opt);
+  });
+  const other = document.createElement("option");
+  other.value = "__other__";
+  other.textContent = "My name is not listed…";
+  sel.appendChild(other);
+  notInList.style.display = "none";
+  sel.onchange = function(){
+    notInList.style.display = sel.value === "__other__" ? "block" : "none";
+  };
+};
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
@@ -383,6 +576,56 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// PUPIL_LISTS, SIP_SCORES and populateNameDropdown are defined in the
+// non-module script above so the dropdown works even if Firebase fails to load.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Teacher PIN ──────────────────────────────────────────────────────────────
+const TEACHER_PIN = "2026"; // ← change this to your preferred PIN
+let pinBuffer = "";
+let teacherUnlocked = false;
+
+window.showPinOverlay = function(){
+  pinBuffer = "";
+  updatePinDots();
+  document.getElementById("pinError").textContent = "";
+  document.getElementById("pinOverlay").classList.add("show");
+};
+window.pinPress = function(val){
+  if (val === "cancel"){ document.getElementById("pinOverlay").classList.remove("show"); return; }
+  if (val === "del"){ pinBuffer = pinBuffer.slice(0,-1); updatePinDots(); return; }
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += val;
+  updatePinDots();
+  if (pinBuffer.length === 4){
+    setTimeout(() => {
+      if (pinBuffer === TEACHER_PIN){
+        teacherUnlocked = true;
+        document.getElementById("pinOverlay").classList.remove("show");
+        document.getElementById("teacherLocked").classList.add("hidden");
+        document.getElementById("teacherContent").classList.remove("hidden");
+        loadTeacherDashboard();
+      } else {
+        document.getElementById("pinError").textContent = "Incorrect PIN. Try again.";
+        pinBuffer = "";
+        updatePinDots();
+      }
+    }, 200);
+  }
+};
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    const dot = document.getElementById("pd"+i);
+    dot.classList.toggle("filled", i < pinBuffer.length);
+  }
+}
+window.lockTeacher = function(){
+  teacherUnlocked = false;
+  document.getElementById("teacherLocked").classList.remove("hidden");
+  document.getElementById("teacherContent").classList.add("hidden");
+};
+// ─────────────────────────────────────────────────────────────────────────────
 
 const WORLDS = [
   {table:2, icon:"🌱", name:"Forest", boss:"Tiny Goblin"},
@@ -510,11 +753,19 @@ function normalizeStudent(s){
 }
 async function saveStudent(){
   if (!state.currentStudentId || !state.currentStudent) return;
-  await setDoc(doc(db, "students", state.currentStudentId), {
-    ...state.currentStudent,
-    updatedAt: serverTimestamp(),
-    createdAt: state.currentStudent.createdAt || serverTimestamp()
-  }, {merge:true});
+  try {
+    await setDoc(doc(db, "students", state.currentStudentId), {
+      ...state.currentStudent,
+      updatedAt: serverTimestamp(),
+      createdAt: state.currentStudent.createdAt || serverTimestamp()
+    }, {merge:true});
+    // Also cache locally as backup
+    try { localStorage.setItem("mmw_" + state.currentStudentId, JSON.stringify(state.currentStudent)); } catch(e){}
+  } catch(err) {
+    // Offline — save locally and show soft warning
+    try { localStorage.setItem("mmw_" + state.currentStudentId, JSON.stringify(state.currentStudent)); } catch(e){}
+    console.warn("Offline save:", err);
+  }
 }
 function getItem(id){ return SHOP_ITEMS.find(i => i.id === id) || null; }
 function owned(id){ return !!state.currentStudent?.inventory?.owned?.includes(id); }
@@ -546,22 +797,44 @@ function claimStreakBonus(student){
 }
 
 window.loginStudent = async function(){
-  const name = document.getElementById("studentName").value.trim();
   const studentClass = document.getElementById("studentClass").value.trim();
-  if (!name || !studentClass) { alert("Please enter student name and class."); return; }
+  const sel = document.getElementById("studentNameSelect");
+  let name = "";
+  if (sel && sel.value && sel.value !== "__other__"){
+    name = sel.value.trim();
+  } else {
+    const typed = document.getElementById("studentName");
+    name = typed ? typed.value.trim() : "";
+  }
+  if (!name || !studentClass) { alert("Please select your year and name."); return; }
 
   const id = studentId(name, studentClass);
-  const snap = await getDoc(doc(db, "students", id));
-  state.currentStudent = snap.exists() ? normalizeStudent(snap.data()) : defaultStudent(name, studentClass);
+  let studentData = null;
+  try {
+    const snap = await getDoc(doc(db, "students", id));
+    studentData = snap.exists() ? normalizeStudent(snap.data()) : null;
+  } catch(err) {
+    const cached = localStorage.getItem("mmw_" + id);
+    if (cached) { try { studentData = normalizeStudent(JSON.parse(cached)); } catch(e){} }
+    document.getElementById("loginStatus").innerHTML = `<span style="color:#f59e0b;font-weight:700;">⚠ Offline mode — progress saved locally</span>`;
+  }
+  state.currentStudent = studentData || defaultStudent(name, studentClass);
+  // Attach SIP scores if available
+  const sipKey = id;
+  if (window.SIP_SCORES[sipKey] && !state.currentStudent.sipScores){
+    state.currentStudent.sipScores = window.SIP_SCORES[sipKey];
+    state.currentStudent.isSip = true;
+  }
   state.currentStudentId = id;
   maybeUpdateStreak(state.currentStudent);
   const bonus = claimStreakBonus(state.currentStudent);
   await saveStudent();
 
-  document.getElementById("loginStatus").innerHTML = `<span class="success">Logged in:</span> ${state.currentStudent.name} (${state.currentStudent.studentClass})${bonus ? ` • streak bonus +${bonus} coins` : ""}`;
+  const sipBadge = state.currentStudent.isSip ? ' <span class="pill" style="background:#dbeafe;color:#1d4ed8;">★ SIP Pupil</span>' : "";
+  document.getElementById("loginStatus").innerHTML = `<span class="success">Logged in:</span> ${state.currentStudent.name} (${state.currentStudent.studentClass})${sipBadge}${bonus ? ` • streak bonus +${bonus} coins` : ""}`;
   renderAll();
   await loadLeaderboard();
-  await loadTeacherDashboard();
+  if (teacherUnlocked) await loadTeacherDashboard();
   showSection('worldsSection');
 };
 
@@ -617,6 +890,33 @@ function renderProfile(){
   challengeBox.classList.remove("hidden");
   currentBox.textContent = `${s.name} • ⭐ ${s.stars} • 🪙 ${s.coins} • x${s.highestUnlockedTable}`;
   shopCoins.textContent = `🪙 ${s.coins} coins`;
+
+  // SIP score panel
+  const sipPanel = document.getElementById("sipScorePanel");
+  if (sipPanel){
+    if (s.isSip && s.sipScores){
+      const sc = s.sipScores;
+      sipPanel.classList.remove("hidden");
+      sipPanel.innerHTML = `
+        <div style="font-weight:900;margin-bottom:8px;font-size:14px;">📊 My SIP Score Progress</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
+          <div style="background:#f8fbff;border:1px solid #dbe4f0;border-radius:12px;padding:8px;">
+            <div style="font-size:18px;font-weight:800;color:${(sc.preTest||0)>=90?'#10b981':'#ef4444'}">${sc.preTest != null ? sc.preTest+'%' : '—'}</div>
+            <div style="font-size:11px;color:#6b7280;">Pre-Test</div>
+          </div>
+          <div style="background:#f8fbff;border:1px solid #dbe4f0;border-radius:12px;padding:8px;">
+            <div style="font-size:18px;font-weight:800;color:${sc.pt1==null?'#9ca3af':(sc.pt1>=90?'#10b981':'#ef4444')}">${sc.pt1 != null ? sc.pt1+'%' : 'X'}</div>
+            <div style="font-size:11px;color:#6b7280;">PT 1</div>
+          </div>
+          <div style="background:#f8fbff;border:1px solid #dbe4f0;border-radius:12px;padding:8px;">
+            <div style="font-size:18px;font-weight:800;color:#2563eb;">90%</div>
+            <div style="font-size:11px;color:#6b7280;">Target</div>
+          </div>
+        </div>`;
+    } else {
+      sipPanel.classList.add("hidden");
+    }
+  }
 
   medalGrid.innerHTML = WORLDS.map(w => {
     const medal = s.medals[w.table] || "none";
@@ -875,7 +1175,7 @@ async function finishQuiz(){
   await saveStudent();
   renderAll();
   await loadLeaderboard();
-  await loadTeacherDashboard();
+  if (teacherUnlocked) await loadTeacherDashboard();
 
   document.getElementById("questionMeta").textContent = "Round Finished";
   document.getElementById("questionText").innerHTML = `
@@ -986,6 +1286,8 @@ function setupRealDragDrop(){
   const dropZone = document.getElementById("dropZone");
   const answerText = document.getElementById("dropAnswerText");
   const chips = document.querySelectorAll(".drag-chip");
+
+  // Mouse drag-and-drop
   chips.forEach(chip => chip.addEventListener("dragstart", e => {
     e.dataTransfer.setData("text/plain", chip.dataset.value);
     e.dataTransfer.setData("chip-id", chip.id);
@@ -1002,6 +1304,47 @@ function setupRealDragDrop(){
     dropZone.appendChild(answerText);
     chips.forEach(c => c.classList.remove("used"));
     document.getElementById(chipId)?.classList.add("used");
+  });
+
+  // Touch support for mobile
+  let touchChip = null;
+  let touchClone = null;
+  chips.forEach(chip => {
+    chip.addEventListener("touchstart", e => {
+      touchChip = chip;
+      const rect = chip.getBoundingClientRect();
+      touchClone = chip.cloneNode(true);
+      touchClone.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;opacity:0.75;z-index:9999;pointer-events:none;`;
+      document.body.appendChild(touchClone);
+    }, {passive:true});
+    chip.addEventListener("touchmove", e => {
+      if (!touchClone) return;
+      const t = e.touches[0];
+      touchClone.style.top = (t.clientY - 30) + "px";
+      touchClone.style.left = (t.clientX - 40) + "px";
+      const dz = dropZone.getBoundingClientRect();
+      if (t.clientX >= dz.left && t.clientX <= dz.right && t.clientY >= dz.top && t.clientY <= dz.bottom){
+        dropZone.classList.add("over");
+      } else {
+        dropZone.classList.remove("over");
+      }
+    }, {passive:true});
+    chip.addEventListener("touchend", e => {
+      if (touchClone) { touchClone.remove(); touchClone = null; }
+      if (!touchChip) return;
+      const t = e.changedTouches[0];
+      const dz = dropZone.getBoundingClientRect();
+      dropZone.classList.remove("over");
+      if (t.clientX >= dz.left && t.clientX <= dz.right && t.clientY >= dz.top && t.clientY <= dz.bottom){
+        window.currentDroppedValue = touchChip.dataset.value;
+        answerText.textContent = touchChip.dataset.value;
+        dropZone.textContent = "";
+        dropZone.appendChild(answerText);
+        chips.forEach(c => c.classList.remove("used"));
+        touchChip.classList.add("used");
+      }
+      touchChip = null;
+    });
   });
 }
 
@@ -1147,7 +1490,7 @@ window.loadLeaderboard = async function(){
     }
   }catch(err){
     console.error(err);
-    top.innerHTML = `<div class="danger">Could not load leaderboard. Check Firestore rules.</div>`;
+    top.innerHTML = `<div class="small" style="color:#f59e0b;">⚠ Could not load leaderboard — check your connection.</div>`;
     around.innerHTML = "";
   }
 };
@@ -1170,6 +1513,25 @@ window.loadTeacherDashboard = async function(){
 
     teacherLb.innerHTML = students.slice(0,10).map((s,i)=>renderPlayerCard(s,`#${i+1}`,false)).join("");
 
+    // SIP test-score summary table
+    const sipStudents = students.filter(s => s.isSip && s.sipScores);
+    if (sipStudents.length){
+      let sipTable = `<div style="margin-top:18px;font-weight:900;margin-bottom:8px;">📊 SIP Test Scores (vs 90% target)</div>`;
+      sipTable += `<div class="heatmap-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:420px;">`;
+      sipTable += `<tr style="text-align:left;color:#6b7280;font-size:11px;"><th style="padding:6px;">Pupil</th><th style="padding:6px;text-align:center;">Year</th><th style="padding:6px;text-align:center;">Pre</th><th style="padding:6px;text-align:center;">PT1</th><th style="padding:6px;text-align:center;">Target</th></tr>`;
+      sipStudents.forEach(s => {
+        const sc = s.sipScores;
+        const cell = (v) => {
+          if (v == null) return `<span style="color:#9ca3af;">X</span>`;
+          const col = v >= 90 ? "#10b981" : "#ef4444";
+          return `<span style="color:${col};font-weight:700;">${v}%</span>`;
+        };
+        sipTable += `<tr style="border-top:0.5px solid #eef2f7;"><td style="padding:6px;">${s.name}</td><td style="padding:6px;text-align:center;">${(s.studentClass||"").replace("Year ","")}</td><td style="padding:6px;text-align:center;">${cell(sc.preTest)}</td><td style="padding:6px;text-align:center;">${cell(sc.pt1)}</td><td style="padding:6px;text-align:center;color:#2563eb;font-weight:700;">90%</td></tr>`;
+      });
+      sipTable += `</table></div>`;
+      teacherLb.innerHTML += sipTable;
+    }
+
     let header = `<div class="heatmap-grid">`;
     header += `<div class="heatcell neutral">Student</div>`;
     WORLDS.forEach(w => header += `<div class="heatcell neutral">×${w.table}</div>`);
@@ -1190,13 +1552,13 @@ window.loadTeacherDashboard = async function(){
     heatmap.innerHTML = header + rows;
   }catch(err){
     console.error(err);
-    teacherLb.innerHTML = `<div class="danger">Could not load dashboard. Check Firestore rules.</div>`;
+    teacherLb.innerHTML = `<div class="small" style="color:#f59e0b;">⚠ Could not load dashboard — check your connection.</div>`;
   }
 };
 
 renderAll();
 loadLeaderboard();
-loadTeacherDashboard();
+// Teacher dashboard loads only after PIN unlock
 </script>
 </body>
 </html>
