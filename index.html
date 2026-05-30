@@ -823,6 +823,26 @@ function daysPracticedInLast(student, n){
   }).length;
 }
 
+// Start of the current week (Monday 00:00)
+function startOfThisWeek(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  const day = d.getDay();               // 0 = Sun, 1 = Mon, ... 6 = Sat
+  const diff = (day === 0) ? 6 : day - 1; // days since Monday
+  d.setDate(d.getDate() - diff);
+  return d;
+}
+
+// Days practised in the current Monday–Sunday week
+function daysPracticedThisWeek(student){
+  if (!Array.isArray(student.practiceDates)) return 0;
+  const weekStart = startOfThisWeek();
+  return student.practiceDates.filter(dStr => {
+    const dt = new Date(dStr + "T00:00:00");
+    return dt >= weekStart;
+  }).length;
+}
+
 window.loginStudent = async function(){
   const studentClass = document.getElementById("studentClass").value.trim();
   const sel = document.getElementById("studentNameSelect");
@@ -918,32 +938,9 @@ function renderProfile(){
   currentBox.textContent = `${s.name} • ⭐ ${s.stars} • 🪙 ${s.coins} • x${s.highestUnlockedTable}`;
   shopCoins.textContent = `🪙 ${s.coins} coins`;
 
-  // SIP score panel
+  // SIP test scores are tracked separately in the Excel report, not shown here.
   const sipPanel = document.getElementById("sipScorePanel");
-  if (sipPanel){
-    if (s.isSip && s.sipScores){
-      const sc = s.sipScores;
-      sipPanel.classList.remove("hidden");
-      sipPanel.innerHTML = `
-        <div style="font-weight:900;margin-bottom:8px;font-size:14px;">📊 My SIP Score Progress</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
-          <div style="background:#f8fbff;border:1px solid #dbe4f0;border-radius:12px;padding:8px;">
-            <div style="font-size:18px;font-weight:800;color:${(sc.preTest||0)>=90?'#10b981':'#ef4444'}">${sc.preTest != null ? sc.preTest+'%' : '—'}</div>
-            <div style="font-size:11px;color:#6b7280;">Pre-Test</div>
-          </div>
-          <div style="background:#f8fbff;border:1px solid #dbe4f0;border-radius:12px;padding:8px;">
-            <div style="font-size:18px;font-weight:800;color:${sc.pt1==null?'#9ca3af':(sc.pt1>=90?'#10b981':'#ef4444')}">${sc.pt1 != null ? sc.pt1+'%' : 'X'}</div>
-            <div style="font-size:11px;color:#6b7280;">PT 1</div>
-          </div>
-          <div style="background:#f8fbff;border:1px solid #dbe4f0;border-radius:12px;padding:8px;">
-            <div style="font-size:18px;font-weight:800;color:#2563eb;">90%</div>
-            <div style="font-size:11px;color:#6b7280;">Target</div>
-          </div>
-        </div>`;
-    } else {
-      sipPanel.classList.add("hidden");
-    }
-  }
+  if (sipPanel) sipPanel.classList.add("hidden");
 
   medalGrid.innerHTML = WORLDS.map(w => {
     const medal = s.medals[w.table] || "none";
@@ -1527,7 +1524,7 @@ window.exportFrequencyCSV = function(){
   const data = window.__freqExportData || [];
   if (!data.length){ alert("No practice data to export yet."); return; }
   const target = window.__weeklyTarget || 2;
-  const headers = ["Pupil","Year","Total Days Practised","Days This Week",`Met Target (${target}+ days)`,"Total Sessions","Current Streak","Last Played","All Practice Dates"];
+  const headers = ["Pupil","Year","Total Days Practised","Days This Week (Mon-Sun)",`Met Target (${target}+ days)`,"Total Sessions","Current Streak","Last Played","All Practice Dates"];
   const rows = data.map(d => [
     `"${d.name}"`, d.year, d.totalDays, d.thisWeek, d.targetMet, d.sessions, d.streak, d.lastPlayed, `"${d.allDates}"`
   ].join(","));
@@ -1561,54 +1558,7 @@ window.loadTeacherDashboard = async function(){
     if (students.length){
       teacherLb.innerHTML = students.slice(0,10).map((s,i)=>renderPlayerCard(s,`#${i+1}`,false)).join("");
     } else {
-      teacherLb.innerHTML = `<div class="small" style="color:#6b7280;">No pupils have played yet. SIP test scores are shown below; game data will appear once pupils start playing.</div>`;
-    }
-
-    // SIP test-score summary table — built from the master SIP_SCORES data,
-    // so it always shows even before pupils have logged in.
-    // Merge in any live game data (highest unlocked table) where available.
-    const liveById = {};
-    students.forEach(s => { liveById[s.id || ""] = s; });
-
-    // Build name+year lookup from PUPIL_LISTS so keys map back to readable names
-    const keyToInfo = {};
-    Object.keys(window.PUPIL_LISTS).forEach(yr => {
-      window.PUPIL_LISTS[yr].forEach(p => {
-        const isSip = p.endsWith("*");
-        if (!isSip) return;
-        const name = p.replace("*","");
-        const id = name.trim().toLowerCase().replace(/\s+/g,"-") + "__" + yr.trim().toLowerCase().replace(/\s+/g,"-");
-        keyToInfo[id] = { name, year: yr.replace("Year ","") };
-      });
-    });
-
-    let sipRows = Object.keys(window.SIP_SCORES).map(key => {
-      const info = keyToInfo[key];
-      if (!info) return null;
-      // Apply class filter
-      if (filterClass !== "All" && ("Year " + info.year) !== filterClass) return null;
-      // Apply search filter
-      if (search && !info.name.toLowerCase().includes(search)) return null;
-      return { key, ...info, sc: window.SIP_SCORES[key], live: liveById[key] || null };
-    }).filter(Boolean);
-
-    sipRows.sort((a,b) => (a.year - b.year) || a.name.localeCompare(b.name));
-
-    if (sipRows.length){
-      const cell = (v) => {
-        if (v == null) return `<span style="color:#9ca3af;">X</span>`;
-        const col = v >= 90 ? "#10b981" : "#ef4444";
-        return `<span style="color:${col};font-weight:700;">${v}%</span>`;
-      };
-      let sipTable = `<div style="margin-top:18px;font-weight:900;margin-bottom:8px;">📊 SIP Test Scores (vs 90% target)</div>`;
-      sipTable += `<div class="heatmap-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:480px;">`;
-      sipTable += `<tr style="text-align:left;color:#6b7280;font-size:11px;"><th style="padding:6px;">Pupil</th><th style="padding:6px;text-align:center;">Year</th><th style="padding:6px;text-align:center;">Pre</th><th style="padding:6px;text-align:center;">PT1</th><th style="padding:6px;text-align:center;">Target</th><th style="padding:6px;text-align:center;">Playing?</th></tr>`;
-      sipRows.forEach(r => {
-        const playing = r.live ? `<span style="color:#10b981;">✓</span>` : `<span style="color:#9ca3af;">—</span>`;
-        sipTable += `<tr style="border-top:0.5px solid #eef2f7;"><td style="padding:6px;">${r.name}</td><td style="padding:6px;text-align:center;">${r.year}</td><td style="padding:6px;text-align:center;">${cell(r.sc.preTest)}</td><td style="padding:6px;text-align:center;">${cell(r.sc.pt1)}</td><td style="padding:6px;text-align:center;color:#2563eb;font-weight:700;">90%</td><td style="padding:6px;text-align:center;">${playing}</td></tr>`;
-      });
-      sipTable += `</table></div>`;
-      teacherLb.innerHTML += sipTable;
+      teacherLb.innerHTML = `<div class="small" style="color:#6b7280;">No pupils have played yet. Game data and home practice frequency will appear once pupils start playing.</div>`;
     }
 
     // ── Home Practice Frequency table ──
@@ -1619,7 +1569,7 @@ window.loadTeacherDashboard = async function(){
 
       let metCount = 0, belowCount = 0;
       freqStudents.forEach(s => {
-        (daysPracticedInLast(s, 7) >= weeklyTarget) ? metCount++ : belowCount++;
+        (daysPracticedThisWeek(s) >= weeklyTarget) ? metCount++ : belowCount++;
       });
 
       let freq = `<div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
@@ -1635,14 +1585,14 @@ window.loadTeacherDashboard = async function(){
         <th style="padding:6px;">Pupil</th>
         <th style="padding:6px;text-align:center;">Year</th>
         <th style="padding:6px;text-align:center;">Total Days</th>
-        <th style="padding:6px;text-align:center;">This Week</th>
+        <th style="padding:6px;text-align:center;">This Week (Mon–Sun)</th>
         <th style="padding:6px;text-align:center;">Target Met?</th>
         <th style="padding:6px;text-align:center;">Sessions</th>
         <th style="padding:6px;text-align:center;">Current Streak</th>
         <th style="padding:6px;text-align:center;">Last Played</th></tr>`;
       freqStudents.forEach(s => {
         const totalDays = s.practiceDates?.length || 0;
-        const thisWeek = daysPracticedInLast(s, 7);
+        const thisWeek = daysPracticedThisWeek(s);
         const met = thisWeek >= weeklyTarget;
         const weekCol = met ? "#10b981" : thisWeek >= 1 ? "#f59e0b" : "#ef4444";
         const metCell = met
@@ -1659,7 +1609,7 @@ window.loadTeacherDashboard = async function(){
           <td style="padding:6px;text-align:center;color:#6b7280;">${s.lastActiveDate||"—"}</td></tr>`;
       });
       freq += `</table></div>`;
-      freq += `<div class="small" style="color:#6b7280;margin-top:6px;">Target = ${weeklyTarget} day(s) of practice per week (change it using the Weekly Target control above). Rows highlighted pink are below target. Total Days = distinct days practised overall.</div>`;
+      freq += `<div class="small" style="color:#6b7280;margin-top:6px;">Target = ${weeklyTarget} day(s) of practice per week (change it using the Weekly Target control above). "This Week" counts days practised in the current Monday–Sunday week and resets every Monday. Rows highlighted pink are below target. Total Days = distinct days practised overall.</div>`;
       teacherLb.innerHTML += freq;
 
       // Stash data for CSV export
@@ -1667,8 +1617,8 @@ window.loadTeacherDashboard = async function(){
         name: s.name,
         year: (s.studentClass||"").replace("Year ",""),
         totalDays: s.practiceDates?.length || 0,
-        thisWeek: daysPracticedInLast(s, 7),
-        targetMet: daysPracticedInLast(s, 7) >= weeklyTarget ? "Yes" : "No",
+        thisWeek: daysPracticedThisWeek(s),
+        targetMet: daysPracticedThisWeek(s) >= weeklyTarget ? "Yes" : "No",
         sessions: s.totalSessions || 0,
         streak: s.streak || 0,
         lastPlayed: s.lastActiveDate || "",
