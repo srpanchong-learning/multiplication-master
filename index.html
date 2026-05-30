@@ -1509,24 +1509,55 @@ window.loadTeacherDashboard = async function(){
     if (filterClass !== "All") students = students.filter(s => s.studentClass === filterClass);
     if (search) students = students.filter(s => (s.name||"").toLowerCase().includes(search));
     students.sort((a,b) => (b.stars||0)-(a.stars||0) || (b.highestUnlockedTable||2)-(a.highestUnlockedTable||2));
-    if (!students.length){ teacherLb.innerHTML = `<div class="small">No data found.</div>`; return; }
 
-    teacherLb.innerHTML = students.slice(0,10).map((s,i)=>renderPlayerCard(s,`#${i+1}`,false)).join("");
+    if (students.length){
+      teacherLb.innerHTML = students.slice(0,10).map((s,i)=>renderPlayerCard(s,`#${i+1}`,false)).join("");
+    } else {
+      teacherLb.innerHTML = `<div class="small" style="color:#6b7280;">No pupils have played yet. SIP test scores are shown below; game data will appear once pupils start playing.</div>`;
+    }
 
-    // SIP test-score summary table
-    const sipStudents = students.filter(s => s.isSip && s.sipScores);
-    if (sipStudents.length){
+    // SIP test-score summary table — built from the master SIP_SCORES data,
+    // so it always shows even before pupils have logged in.
+    // Merge in any live game data (highest unlocked table) where available.
+    const liveById = {};
+    students.forEach(s => { liveById[s.id || ""] = s; });
+
+    // Build name+year lookup from PUPIL_LISTS so keys map back to readable names
+    const keyToInfo = {};
+    Object.keys(window.PUPIL_LISTS).forEach(yr => {
+      window.PUPIL_LISTS[yr].forEach(p => {
+        const isSip = p.endsWith("*");
+        if (!isSip) return;
+        const name = p.replace("*","");
+        const id = name.trim().toLowerCase().replace(/\s+/g,"-") + "__" + yr.trim().toLowerCase().replace(/\s+/g,"-");
+        keyToInfo[id] = { name, year: yr.replace("Year ","") };
+      });
+    });
+
+    let sipRows = Object.keys(window.SIP_SCORES).map(key => {
+      const info = keyToInfo[key];
+      if (!info) return null;
+      // Apply class filter
+      if (filterClass !== "All" && ("Year " + info.year) !== filterClass) return null;
+      // Apply search filter
+      if (search && !info.name.toLowerCase().includes(search)) return null;
+      return { key, ...info, sc: window.SIP_SCORES[key], live: liveById[key] || null };
+    }).filter(Boolean);
+
+    sipRows.sort((a,b) => (a.year - b.year) || a.name.localeCompare(b.name));
+
+    if (sipRows.length){
+      const cell = (v) => {
+        if (v == null) return `<span style="color:#9ca3af;">X</span>`;
+        const col = v >= 90 ? "#10b981" : "#ef4444";
+        return `<span style="color:${col};font-weight:700;">${v}%</span>`;
+      };
       let sipTable = `<div style="margin-top:18px;font-weight:900;margin-bottom:8px;">📊 SIP Test Scores (vs 90% target)</div>`;
-      sipTable += `<div class="heatmap-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:420px;">`;
-      sipTable += `<tr style="text-align:left;color:#6b7280;font-size:11px;"><th style="padding:6px;">Pupil</th><th style="padding:6px;text-align:center;">Year</th><th style="padding:6px;text-align:center;">Pre</th><th style="padding:6px;text-align:center;">PT1</th><th style="padding:6px;text-align:center;">Target</th></tr>`;
-      sipStudents.forEach(s => {
-        const sc = s.sipScores;
-        const cell = (v) => {
-          if (v == null) return `<span style="color:#9ca3af;">X</span>`;
-          const col = v >= 90 ? "#10b981" : "#ef4444";
-          return `<span style="color:${col};font-weight:700;">${v}%</span>`;
-        };
-        sipTable += `<tr style="border-top:0.5px solid #eef2f7;"><td style="padding:6px;">${s.name}</td><td style="padding:6px;text-align:center;">${(s.studentClass||"").replace("Year ","")}</td><td style="padding:6px;text-align:center;">${cell(sc.preTest)}</td><td style="padding:6px;text-align:center;">${cell(sc.pt1)}</td><td style="padding:6px;text-align:center;color:#2563eb;font-weight:700;">90%</td></tr>`;
+      sipTable += `<div class="heatmap-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:480px;">`;
+      sipTable += `<tr style="text-align:left;color:#6b7280;font-size:11px;"><th style="padding:6px;">Pupil</th><th style="padding:6px;text-align:center;">Year</th><th style="padding:6px;text-align:center;">Pre</th><th style="padding:6px;text-align:center;">PT1</th><th style="padding:6px;text-align:center;">Target</th><th style="padding:6px;text-align:center;">Playing?</th></tr>`;
+      sipRows.forEach(r => {
+        const playing = r.live ? `<span style="color:#10b981;">✓</span>` : `<span style="color:#9ca3af;">—</span>`;
+        sipTable += `<tr style="border-top:0.5px solid #eef2f7;"><td style="padding:6px;">${r.name}</td><td style="padding:6px;text-align:center;">${r.year}</td><td style="padding:6px;text-align:center;">${cell(r.sc.preTest)}</td><td style="padding:6px;text-align:center;">${cell(r.sc.pt1)}</td><td style="padding:6px;text-align:center;color:#2563eb;font-weight:700;">90%</td><td style="padding:6px;text-align:center;">${playing}</td></tr>`;
       });
       sipTable += `</table></div>`;
       teacherLb.innerHTML += sipTable;
