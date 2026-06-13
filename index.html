@@ -1522,15 +1522,6 @@ function itemLocationMsg(item){
   return "Check your profile card at the top of the page!";
 }
 
-function itemLocationMsg(item){
-  if (item.type === "background") return "Look at your home screen — the background has changed! Scroll up to see it.";
-  if (item.type === "avatar") return "Your new avatar is now on your profile card at the top of the page, and on the leaderboard!";
-  if (item.type === "frame") return "Your avatar now has a fancy new frame! Check your profile card at the top.";
-  if (item.type === "title") return "Your new title is now shown under your name on your profile card and the leaderboard!";
-  if (item.type === "sticker") return "Your sticker is now on your profile card and next to your name on the leaderboard!";
-  return "Check your profile card at the top of the page!";
-}
-
 // Estimate how many ~10-question quizzes are needed to earn `needed` coins,
 // based on the pupil's current world (≈8 correct per quiz at the world's coin rate).
 function quizzesAway(needed){
