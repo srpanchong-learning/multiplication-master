@@ -453,6 +453,25 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
 </div>
 
 <script>
+// ── Debug error banner: shows any JavaScript error on screen ──
+window.addEventListener("error", function(e){
+  showDebugError((e.message || "Unknown error") + (e.filename ? "" : "") + (e.lineno ? " (line " + e.lineno + ")" : ""));
+});
+window.addEventListener("unhandledrejection", function(e){
+  showDebugError("Promise error: " + (e.reason && e.reason.message ? e.reason.message : String(e.reason)));
+});
+function showDebugError(msg){
+  var b = document.getElementById("debugErrorBanner");
+  if (!b){
+    b = document.createElement("div");
+    b.id = "debugErrorBanner";
+    b.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:#b91c1c;color:#fff;padding:10px 14px;font:13px/1.4 Arial;white-space:pre-wrap;";
+    document.body ? document.body.appendChild(b) : document.addEventListener("DOMContentLoaded", function(){ document.body.appendChild(b); });
+  }
+  b.textContent = "⚠ ERROR (send this to Claude): " + msg;
+}
+</script>
+<script>
 // ── Pupil data + dropdown (regular script, runs immediately, no dependencies) ──
 window.PUPIL_LISTS = {
   "Year 1": [
