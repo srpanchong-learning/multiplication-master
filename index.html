@@ -165,8 +165,27 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
 @keyframes fall{from{transform:translateY(-30px) rotate(0deg)}to{transform:translateY(420px) rotate(540deg);opacity:0}}
 .bg-sky-theme{background:linear-gradient(180deg,#dbeafe,#eff6ff)}
 .bg-jungle-theme{background:linear-gradient(180deg,#dcfce7,#f0fdf4)}
+.bg-sky-theme .hero{background:linear-gradient(135deg,#dbeafe,#eff6ff);border-color:#bfdbfe}
+.bg-jungle-theme .hero{background:linear-gradient(135deg,#dcfce7,#f0fdf4);border-color:#bbf7d0}
 .bg-galaxy-theme{background:linear-gradient(180deg,#1e1b4b,#312e81);color:#fff}
-.bg-galaxy-theme .muted,.bg-galaxy-theme .small,.bg-galaxy-theme .section-title p,.bg-galaxy-theme label{color:#dbeafe}
+/* Galaxy theme: darken every inner surface so white text stays readable */
+.bg-galaxy-theme .hero{background:linear-gradient(135deg,#1e1b4b,#312e81);border-color:#4c1d95}
+.bg-galaxy-theme .card{background:#312e81;border-color:#4c1d95;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.bg-galaxy-theme .profile{background:rgba(255,255,255,.08);border-color:#4c1d95}
+.bg-galaxy-theme .stat{background:rgba(255,255,255,.08);border-color:#4c1d95;color:#e0e7ff}
+.bg-galaxy-theme .stat .n{color:#93c5fd}
+.bg-galaxy-theme h1,.bg-galaxy-theme h2,.bg-galaxy-theme h3,.bg-galaxy-theme h4{color:#fff}
+.bg-galaxy-theme .hero h2{color:#fff}
+.bg-galaxy-theme .hero p{color:#c7d2fe}
+.bg-galaxy-theme .muted,.bg-galaxy-theme .small,.bg-galaxy-theme .section-title p,.bg-galaxy-theme label{color:#c7d2fe}
+.bg-galaxy-theme input,.bg-galaxy-theme select{background:#1e1b4b;color:#fff;border-color:#4c1d95}
+.bg-galaxy-theme input::placeholder{color:#a5b4fc}
+.bg-galaxy-theme .success{color:#6ee7b7}
+.bg-galaxy-theme .danger{color:#fca5a5}
+.bg-galaxy-theme .medal-strip{background:#312e81;border-color:#4c1d95}
+.bg-galaxy-theme .medal-card{background:rgba(255,255,255,.08);border-color:#4c1d95;color:#e0e7ff}
+.bg-galaxy-theme .avatar{background:#1e1b4b;border-color:#4c1d95}
+.bg-galaxy-theme .btn-secondary{background:#1e1b4b;color:#93c5fd;border-color:#4c1d95}
 @media (max-width: 900px){
   .grid-hero,.quiz-wrap{grid-template-columns:1fr}
   .meta-grid{grid-template-columns:repeat(2,1fr)}
