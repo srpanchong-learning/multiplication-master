@@ -334,6 +334,7 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
       </div>
       <div id="shopCoins" class="pill">🪙 0 coins</div>
     </div>
+    <div id="shopProfileStrip"></div>
     <div id="inventorySummary" class="small" style="margin-bottom:14px;">Login to view inventory.</div>
     <div id="shopGrid" class="shop-grid"></div>
   </div>
@@ -429,12 +430,25 @@ input,select{width:100%;padding:12px 14px;border-radius:14px;border:2px solid #d
 </div>
 
 
+<div id="overlay" class="overlay">
   <div class="modal">
     <div id="confettiWrap" class="confetti-wrap"></div>
     <div id="modalIcon" style="font-size:34px;margin-bottom:10px;">🎉</div>
     <h2 id="modalTitle">Unlocked!</h2>
     <p id="modalText">Great work.</p>
     <button class="btn btn-primary" onclick="closeModal()">Awesome!</button>
+  </div>
+</div>
+
+<div id="confirmOverlay" class="overlay">
+  <div class="modal">
+    <div id="confirmPreview" style="margin:0 auto 14px;"></div>
+    <h2 id="confirmTitle" style="font-size:26px;">Buy this item?</h2>
+    <p id="confirmText"></p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:14px;">
+      <button class="btn btn-primary" id="confirmYesBtn" onclick="confirmBuyYes()">✓ Yes, buy it!</button>
+      <button class="btn btn-secondary" onclick="closeConfirm()">✕ Not now</button>
+    </div>
   </div>
 </div>
 
@@ -733,6 +747,7 @@ function defaultStudent(name, studentClass){
     highestUnlockedTable:2,
     completedMethods, accuracies, bosses, chests, medals,
     inventory:{owned:[], equipped:{avatar:null,frame:null,background:null,title:null,sticker:null}},
+    wishlistItemId:null, purchaseLog:[],
     dailyChallenge:{date:todayKey(), target:10, progress:0, reward:15, claimed:false},
     updatedAt:null, createdAt:null
   };
@@ -761,6 +776,8 @@ function normalizeStudent(s){
   if (!Array.isArray(s.inventory.owned)) s.inventory.owned = [];
   if (!s.inventory.equipped) s.inventory.equipped = {avatar:null,frame:null,background:null,title:null,sticker:null};
   ["avatar","frame","background","title","sticker"].forEach(k => { if (!(k in s.inventory.equipped)) s.inventory.equipped[k] = null; });
+  if (!("wishlistItemId" in s)) s.wishlistItemId = null;
+  if (!Array.isArray(s.purchaseLog)) s.purchaseLog = [];
   if (!s.dailyChallenge || s.dailyChallenge.date !== todayKey()){
     s.dailyChallenge = {date:todayKey(), target:10, progress:0, reward:15, claimed:false};
   }
@@ -948,6 +965,27 @@ function renderProfile(){
     ? `✅ Daily challenge complete (+${s.dailyChallenge.reward} coins claimed)`
     : `🎯 Daily challenge: ${s.dailyChallenge.progress}/${s.dailyChallenge.target} correct answers for +${s.dailyChallenge.reward} coins`;
   challengeBox.classList.remove("hidden");
+
+  // Wishlist saving goal pill
+  let wishBox = document.getElementById("wishBox");
+  if (!wishBox){
+    wishBox = document.createElement("div");
+    wishBox.id = "wishBox";
+    wishBox.className = "pill hidden";
+    wishBox.style.cssText = "margin-top:10px;background:#fdf2f8;color:#be185d;cursor:pointer;";
+    wishBox.onclick = () => showSection('shopSection');
+    challengeBox.parentNode.insertBefore(wishBox, challengeBox.nextSibling);
+  }
+  const wishItem = s.wishlistItemId && !s.inventory.owned.includes(s.wishlistItemId) ? getItem(s.wishlistItemId) : null;
+  if (wishItem){
+    const need = Math.max(0, wishItem.price - s.coins);
+    wishBox.textContent = need > 0
+      ? `💖 Saving for ${wishItem.preview} ${wishItem.name}: 🪙 ${s.coins}/${wishItem.price} — ${need} more!`
+      : `💖 You can buy ${wishItem.preview} ${wishItem.name} now! Tap to go to the shop 🎉`;
+    wishBox.classList.remove("hidden");
+  } else {
+    wishBox.classList.add("hidden");
+  }
   currentBox.textContent = `${s.name} • ⭐ ${s.stars} • 🪙 ${s.coins} • x${s.highestUnlockedTable}`;
   shopCoins.textContent = `🪙 ${s.coins} coins`;
 
@@ -1456,28 +1494,167 @@ function generateQuestions(table, methodKey, count, boss=false){
 function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 function shuffle(arr){ return [...arr].sort(() => Math.random()-0.5); }
 
+function itemLocationMsg(item){
+  if (item.type === "background") return "Look at your home screen — the background has changed! Scroll up to see it.";
+  if (item.type === "avatar") return "Your new avatar is now on your profile card at the top of the page, and on the leaderboard!";
+  if (item.type === "frame") return "Your avatar now has a fancy new frame! Check your profile card at the top.";
+  if (item.type === "title") return "Your new title is now shown under your name on your profile card and the leaderboard!";
+  if (item.type === "sticker") return "Your sticker is now on your profile card and next to your name on the leaderboard!";
+  return "Check your profile card at the top of the page!";
+}
+
+function itemLocationMsg(item){
+  if (item.type === "background") return "Look at your home screen — the background has changed! Scroll up to see it.";
+  if (item.type === "avatar") return "Your new avatar is now on your profile card at the top of the page, and on the leaderboard!";
+  if (item.type === "frame") return "Your avatar now has a fancy new frame! Check your profile card at the top.";
+  if (item.type === "title") return "Your new title is now shown under your name on your profile card and the leaderboard!";
+  if (item.type === "sticker") return "Your sticker is now on your profile card and next to your name on the leaderboard!";
+  return "Check your profile card at the top of the page!";
+}
+
+// Estimate how many ~10-question quizzes are needed to earn `needed` coins,
+// based on the pupil's current world (≈8 correct per quiz at the world's coin rate).
+function quizzesAway(needed){
+  const table = state.currentStudent?.highestUnlockedTable || 2;
+  const perQuiz = Math.max(8, 8 * Math.max(1, Math.round(worldMultiplier(table))));
+  return Math.max(1, Math.ceil(needed / perQuiz));
+}
+
+function confirmPreviewHtml(item){
+  const s = state.currentStudent;
+  if (item.type === "avatar" || item.type === "frame"){
+    const curAvatar = getItem(equipped("avatar"));
+    const curFrame = getItem(equipped("frame"));
+    const avatarClass = item.type === "avatar" ? (item.previewClass || "") : (curAvatar?.previewClass || "");
+    const frameClass = item.type === "frame" ? (item.previewClass || "") : (curFrame?.previewClass || "");
+    const emoji = item.type === "avatar" ? item.avatarEmoji : (curAvatar?.avatarEmoji || "🙂");
+    return `<div class="avatar ${avatarClass} ${frameClass}" style="width:90px;height:90px;font-size:44px;margin:0 auto;">${emoji}</div>
+      <div class="small" style="margin-top:8px;">This is how <b>you</b> will look!</div>`;
+  }
+  if (item.type === "background"){
+    return `<div class="item-preview ${item.previewClass || ""}" style="height:100px;max-width:280px;margin:0 auto;font-size:15px;">Your home screen</div>
+      <div class="small" style="margin-top:8px;">Your home screen will look like this.</div>`;
+  }
+  if (item.type === "title"){
+    return `<div style="font-size:20px;font-weight:900;">${s?.name || "You"}</div>
+      <div style="color:var(--purple);font-weight:800;">${item.name}</div>
+      <div class="small" style="margin-top:8px;">Shown under your name everywhere.</div>`;
+  }
+  if (item.type === "sticker"){
+    return `<div style="font-size:44px;">${item.preview}</div>
+      <div class="sticker" style="margin-top:6px;">${item.preview} ${item.name}</div>
+      <div class="small" style="margin-top:8px;">Shown next to your name.</div>`;
+  }
+  return `<div class="item-preview ${item.previewClass || ""}" style="max-width:200px;margin:0 auto;">${item.preview}</div>`;
+}
+
+let pendingBuyItemId = null;
+
+window.openBuyConfirm = function(itemId){
+  if (!state.currentStudent){ alert("Please log in first."); return; }
+  const item = getItem(itemId);
+  if (!item) return;
+  const s = state.currentStudent;
+  pendingBuyItemId = itemId;
+  document.getElementById("confirmPreview").innerHTML = confirmPreviewHtml(item);
+  document.getElementById("confirmTitle").textContent = `Buy ${item.name}?`;
+  document.getElementById("confirmText").innerHTML =
+    `It costs <b>🪙 ${item.price}</b>. You have <b>🪙 ${s.coins}</b>, so you will have <b>🪙 ${s.coins - item.price}</b> left.`;
+  document.getElementById("confirmOverlay").classList.add("show");
+};
+window.closeConfirm = function(){
+  pendingBuyItemId = null;
+  document.getElementById("confirmOverlay").classList.remove("show");
+};
+window.confirmBuyYes = function(){
+  const id = pendingBuyItemId;
+  window.closeConfirm();
+  if (id) doBuy(id);
+};
+
+async function doBuy(itemId){
+  const item = getItem(itemId);
+  const s = state.currentStudent;
+  if (!item || !s) return;
+  if (s.coins < item.price) return;
+  s.coins -= item.price;
+  s.inventory.owned.push(itemId);
+  s.inventory.equipped[item.type] = itemId;
+  if (s.wishlistItemId === itemId) s.wishlistItemId = null;
+  // Purchase log → teacher CSV export (engagement evidence)
+  try {
+    if (!Array.isArray(s.purchaseLog)) s.purchaseLog = [];
+    s.purchaseLog.push({ ts:new Date().toISOString(), date:todayKey(), itemId:item.id, name:item.name, type:item.type, price:item.price, coinsAfter:s.coins });
+    if (s.purchaseLog.length > 200) s.purchaseLog = s.purchaseLog.slice(-200);
+  } catch(e){}
+  renderAll();
+  showModal("🛍️", `${item.preview} ${item.name} Purchased!`, `You spent 🪙 ${item.price} coins and it is equipped now. ${itemLocationMsg(item)}`);
+  saveStudent();
+  loadLeaderboard();
+  if (teacherUnlocked) loadTeacherDashboard();
+}
+
 window.buyItem = async function(itemId){
   if (!state.currentStudent){ alert("Please log in first."); return; }
   const item = getItem(itemId);
   if (!item) return;
   if (owned(itemId)){
+    // Already owned → equip instantly, no confirmation needed
     state.currentStudent.inventory.equipped[item.type] = itemId;
-    await saveStudent(); renderAll(); await loadLeaderboard(); await loadTeacherDashboard();
+    renderAll();
+    showModal("✅", `${item.preview} ${item.name} Equipped!`, itemLocationMsg(item));
+    saveStudent();
+    loadLeaderboard();
+    if (teacherUnlocked) loadTeacherDashboard();
     return;
   }
-  if (state.currentStudent.coins < item.price){ alert("Not enough coins yet."); return; }
-  state.currentStudent.coins -= item.price;
-  state.currentStudent.inventory.owned.push(itemId);
-  state.currentStudent.inventory.equipped[item.type] = itemId;
-  await saveStudent();
-  renderAll();
-  await loadLeaderboard();
-  await loadTeacherDashboard();
+  if (state.currentStudent.coins < item.price) return; // button is disabled in this case anyway
+  openBuyConfirm(itemId);
 };
+
+window.toggleWishlist = async function(itemId){
+  const s = state.currentStudent;
+  if (!s) return;
+  s.wishlistItemId = (s.wishlistItemId === itemId) ? null : itemId;
+  renderAll();
+  saveStudent();
+};
+
+function renderShopProfileStrip(){
+  const strip = document.getElementById("shopProfileStrip");
+  if (!strip) return;
+  const s = state.currentStudent;
+  if (!s){ strip.innerHTML = ""; return; }
+  const avatarItem = getItem(equipped("avatar"));
+  const frameItem = getItem(equipped("frame"));
+  const titleItem = getItem(equipped("title"));
+  const stickerItem = getItem(equipped("sticker"));
+  let wishHtml = "";
+  const wishItem = s.wishlistItemId && !owned(s.wishlistItemId) ? getItem(s.wishlistItemId) : null;
+  if (wishItem){
+    const pct = Math.min(100, Math.round((s.coins / wishItem.price) * 100));
+    const need = Math.max(0, wishItem.price - s.coins);
+    wishHtml = `<div style="flex:1;min-width:200px;">
+      <div class="small" style="font-weight:800;">💖 Saving for: ${wishItem.preview} ${wishItem.name}</div>
+      <div class="progress" style="margin:6px 0 4px;"><span style="width:${pct}%"></span></div>
+      <div class="small">🪙 ${s.coins} / ${wishItem.price}${need > 0 ? ` • ${need} more (about ${quizzesAway(need)} quiz${quizzesAway(need)===1?"":"zes"} away!)` : " • You can buy it now! 🎉"}</div>
+    </div>`;
+  }
+  strip.innerHTML = `<div class="profile" style="margin:0 0 14px;flex-wrap:wrap;">
+    <div class="avatar ${avatarItem?.previewClass || ""} ${frameItem?.previewClass || ""}" style="width:56px;height:56px;font-size:26px;">${avatarItem?.avatarEmoji || "🙂"}</div>
+    <div style="min-width:160px;">
+      <div style="font-weight:900;">${s.name}</div>
+      <div class="small">${titleItem?.name || "No title"}${stickerItem ? " • " + stickerItem.preview : ""}</div>
+      <div class="small">🪙 ${s.coins} coins</div>
+    </div>
+    ${wishHtml}
+  </div>`;
+}
 
 function renderShop(){
   const grid = document.getElementById("shopGrid");
   const summary = document.getElementById("inventorySummary");
+  renderShopProfileStrip();
   if (!state.currentStudent){
     summary.textContent = "Login to view inventory.";
     grid.innerHTML = `<div class="small">No student logged in yet.</div>`;
@@ -1487,14 +1664,22 @@ function renderShop(){
   summary.innerHTML = `Owned items: <b>${s.inventory.owned.length}</b> • Avatar: <b>${getItem(equipped("avatar"))?.name || "None"}</b> • Frame: <b>${getItem(equipped("frame"))?.name || "None"}</b> • Background: <b>${getItem(equipped("background"))?.name || "None"}</b> • Title: <b>${getItem(equipped("title"))?.name || "None"}</b> • Sticker: <b>${getItem(equipped("sticker"))?.name || "None"}</b>`;
   grid.innerHTML = SHOP_ITEMS.map(item => {
     const own = owned(item.id), equip = equipped(item.type) === item.id;
-    return `<div class="shop-item ${own ? "owned" : ""}">
+    const affordable = s.coins >= item.price;
+    const wished = s.wishlistItemId === item.id;
+    const need = item.price - s.coins;
+    let btn;
+    if (equip) btn = `<button class="btn btn-green" style="width:100%" onclick="buyItem('${item.id}')">Equipped</button>`;
+    else if (own) btn = `<button class="btn btn-secondary" style="width:100%" onclick="buyItem('${item.id}')">Equip</button>`;
+    else if (affordable) btn = `<button class="btn btn-primary" style="width:100%" onclick="buyItem('${item.id}')">Buy</button>`;
+    else btn = `<button class="btn btn-secondary" style="width:100%;opacity:.7;" disabled>🪙 ${need} more (~${quizzesAway(need)} quiz${quizzesAway(need)===1?"":"zes"})</button>`;
+    const heart = own ? "" : `<button class="btn btn-secondary" style="width:100%;margin-top:8px;padding:8px;font-size:12px;${wished ? "background:#fdf2f8;border-color:#f9a8d4;color:#be185d;" : ""}" onclick="toggleWishlist('${item.id}')">${wished ? "💖 Saving for this!" : "🤍 Save up for this"}</button>`;
+    return `<div class="shop-item ${own ? "owned" : ""}" ${!own && !affordable ? 'style="opacity:.85;"' : ""}>
       <div class="item-preview ${item.previewClass || ""}">${item.preview}</div>
-      <div style="font-size:18px;font-weight:800;">${item.name}${own ? '<span class="owned-badge">Owned</span>' : ''}</div>
+      <div style="font-size:18px;font-weight:800;">${item.name}${own ? '<span class="owned-badge">Owned</span>' : ''}${wished ? ' <span style="font-size:14px;">💖</span>' : ''}</div>
       <div class="small" style="margin:6px 0 10px;">${item.type.charAt(0).toUpperCase()+item.type.slice(1)}</div>
       <div class="pill" style="margin-bottom:12px;">🪙 ${item.price}</div>
-      <button class="btn ${equip ? "btn-green" : own ? "btn-secondary" : "btn-primary"}" style="width:100%" onclick="buyItem('${item.id}')">
-        ${equip ? "Equipped" : own ? "Equip" : "Buy"}
-      </button>
+      ${btn}
+      ${heart}
     </div>`;
   }).join("");
 }
@@ -1561,6 +1746,31 @@ window.loadLeaderboard = async function(){
     top.innerHTML = `<div class="small" style="color:#f59e0b;">⚠ Could not load leaderboard — check your connection.</div>`;
     around.innerHTML = "";
   }
+};
+
+window.exportPurchasesCSV = function(){
+  const students = window.__purchaseExportStudents || [];
+  const rows = [];
+  students.forEach(s => {
+    (s.purchaseLog || []).forEach(p => {
+      rows.push([
+        p.date, p.ts, `"${s.name}"`, `"${s.studentClass || ""}"`,
+        `"${p.name}"`, p.type, p.price, p.coinsAfter
+      ].join(","));
+    });
+  });
+  if (!rows.length){ alert("No purchase data yet. Purchases are recorded when pupils buy items in the Coin Shop."); return; }
+  const headers = ["date_key","timestamp_iso","player_name","player_class","item_name","item_type","coins_spent","coins_after"];
+  const csv = headers.join(",") + "\n" + rows.join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `coin_shop_purchases_${todayKey()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 window.exportSessionsCSV = function(){
@@ -1651,6 +1861,7 @@ window.loadTeacherDashboard = async function(){
         <span style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="exportFrequencyCSV()">⬇ Frequency CSV</button>
         <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="exportSessionsCSV()">⬇ Sessions CSV (SIP)</button>
+        <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="exportPurchasesCSV()">⬇ Purchases CSV</button>
         </span>
       </div>`;
       freq += `<div style="display:flex;gap:10px;margin:8px 0;flex-wrap:wrap;">
@@ -1702,6 +1913,7 @@ window.loadTeacherDashboard = async function(){
         allDates: (s.practiceDates||[]).join(" | ")
       }));
       window.__weeklyTarget = weeklyTarget;
+      window.__purchaseExportStudents = freqStudents;
     }
 
     let header = `<div class="heatmap-grid">`;
