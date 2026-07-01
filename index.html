@@ -1104,6 +1104,7 @@ function renderQuizQuestion(){
     return;
   }
   if (q.type === "dragDropReal"){
+    document.querySelectorAll(".touch-drag-clone").forEach(el => el.remove());
     area.innerHTML = buildDragDropVisual(q);
     setupRealDragDrop();
   }
@@ -1125,13 +1126,7 @@ window.submitDroppedAnswer = function(){
 
 function answerQuestion(answer){
   const q = state.quizQuestions[state.quizIndex];
-  if (!q){ return; }
   const correct = String(answer).trim() === String(q.correct).trim();
-  // Ensure an accuracy record exists for this table (older records may lack it)
-  if (!state.currentStudent.accuracies) state.currentStudent.accuracies = {};
-  if (!state.currentStudent.accuracies[state.selectedTable]){
-    state.currentStudent.accuracies[state.selectedTable] = { correct:0, total:0 };
-  }
   const acc = state.currentStudent.accuracies[state.selectedTable];
   acc.total += 1;
 
@@ -1342,9 +1337,11 @@ function setupRealDragDrop(){
   let touchClone = null;
   chips.forEach(chip => {
     chip.addEventListener("touchstart", e => {
+      if (touchClone) { touchClone.remove(); touchClone = null; }
       touchChip = chip;
       const rect = chip.getBoundingClientRect();
       touchClone = chip.cloneNode(true);
+      touchClone.classList.add("touch-drag-clone");
       touchClone.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;opacity:0.75;z-index:9999;pointer-events:none;`;
       document.body.appendChild(touchClone);
     }, {passive:true});
@@ -1375,6 +1372,11 @@ function setupRealDragDrop(){
         touchChip.classList.add("used");
       }
       touchChip = null;
+    });
+    chip.addEventListener("touchcancel", () => {
+      if (touchClone) { touchClone.remove(); touchClone = null; }
+      touchChip = null;
+      dropZone.classList.remove("over");
     });
   });
 }
